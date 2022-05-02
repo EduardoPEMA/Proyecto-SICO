@@ -5,6 +5,8 @@
  */
 package cliente.servidor;
 
+import utils.Utils;
+
 /**
  *
  * @author isaac
@@ -14,9 +16,16 @@ public class ClientesView extends javax.swing.JFrame {
     /**
      * Creates new form UsuariosView
      */
+    private boolean nombreIsValid = false;
+    private boolean RFCIsValid = false;
+    private boolean telefonoIsValid = false;
+    private Utils utils = new Utils();
+
     public ClientesView() {
         initComponents();
         this.setLocationRelativeTo(null);
+        permitirAccion();
+
     }
 
     /**
@@ -61,6 +70,12 @@ public class ClientesView extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("RFC");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, -1, -1));
+
+        rfcInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                rfcInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(rfcInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, 270, 40));
 
         jLabel6.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -75,6 +90,12 @@ public class ClientesView extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Usuario");
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, -1, -1));
+
+        nombreInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                nombreInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(nombreInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 270, 40));
 
         buscarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
@@ -95,6 +116,12 @@ public class ClientesView extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setText("Telefono");
         getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 230, -1, -1));
+
+        telefonoInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                telefonoInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(telefonoInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 250, 270, 40));
 
         cancelarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
@@ -151,6 +178,14 @@ public class ClientesView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private boolean getEstados() {
+        return nombreIsValid && RFCIsValid && telefonoIsValid;
+    }
+
+    private void permitirAccion() {
+        boolean permitir = getEstados();
+        guardarButton.setEnabled(permitir);
+    }
     private void buscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_buscarButtonActionPerformed
@@ -174,6 +209,30 @@ public class ClientesView extends javax.swing.JFrame {
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_eliminarButtonActionPerformed
+
+    private void nombreInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nombreInputKeyReleased
+        // TODO add your handling code here:
+        String aux = nombreInput.getText();
+        nombreIsValid = utils.isStringOnlyAlphabet(aux);
+        permitirAccion();
+
+    }//GEN-LAST:event_nombreInputKeyReleased
+
+    private void rfcInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_rfcInputKeyReleased
+        // TODO add your handling code here:
+        String aux = rfcInput.getText();
+        RFCIsValid = !aux.equals("")
+                && (aux != null)
+                && (aux.matches("^([A-ZÑ\\x26]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1]))((-)?([A-Z\\d]{3}))?$"));
+        permitirAccion();
+    }//GEN-LAST:event_rfcInputKeyReleased
+
+    private void telefonoInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_telefonoInputKeyReleased
+        // TODO add your handling code here:
+        String aux = telefonoInput.getText();
+        telefonoIsValid = utils.isNumber(aux);
+        permitirAccion();
+    }//GEN-LAST:event_telefonoInputKeyReleased
 
     /**
      * @param args the command line arguments

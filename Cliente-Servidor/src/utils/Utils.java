@@ -16,4 +16,10 @@ public final class Utils {
                 && (str != null)
                 && (str.matches("^[a-zA-Z]*$")));
     }
+    
+    public static boolean isNumber(String str) {
+        return ((!str.equals(""))
+                && (str != null)
+                && (str.matches("^\\s*(?:\\+?(\\d{1,3}))?[-. (]*(\\d{3})[-. )]*(\\d{3})[-. ]*(\\d{4})(?: *x(\\d+))?\\s*$")));
+    }
 }
