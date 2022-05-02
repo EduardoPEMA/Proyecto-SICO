@@ -5,6 +5,8 @@
  */
 package cliente.servidor;
 
+import utils.Utils;
+
 /**
  *
  * @author isaac
@@ -14,9 +16,15 @@ public class UsuariosView extends javax.swing.JFrame {
     /**
      * Creates new form UsuariosView
      */
+    private boolean nombreIsValid = false;
+    private boolean passwordIsValid = false;
+    private boolean usernameIsValid = false;
+    private Utils utils = new Utils();
+
     public UsuariosView() {
         initComponents();
         this.setLocationRelativeTo(null);
+        permitirAccion();
     }
 
     /**
@@ -63,6 +71,12 @@ public class UsuariosView extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Username");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, -1, -1));
+
+        usernameInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                usernameInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(usernameInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, 270, 40));
 
         jLabel6.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -77,6 +91,12 @@ public class UsuariosView extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Usuario");
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, -1, -1));
+
+        nombreInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                nombreInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(nombreInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 270, 40));
 
         buscarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
@@ -97,6 +117,12 @@ public class UsuariosView extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setText("Password");
         getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 230, -1, -1));
+
+        passwordInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                passwordInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(passwordInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 250, 270, 40));
 
         jLabel10.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -108,6 +134,11 @@ public class UsuariosView extends javax.swing.JFrame {
         perfilInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 perfilInputActionPerformed(evt);
+            }
+        });
+        perfilInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                perfilInputKeyReleased(evt);
             }
         });
         getContentPane().add(perfilInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 320, 270, 40));
@@ -166,6 +197,14 @@ public class UsuariosView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private boolean getEstados(){
+        return nombreIsValid && passwordIsValid && usernameIsValid;
+    }
+    
+    private void permitirAccion(){
+        boolean permitir = getEstados();
+        guardarButton.setEnabled(permitir);
+    }
     private void buscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_buscarButtonActionPerformed
@@ -184,6 +223,7 @@ public class UsuariosView extends javax.swing.JFrame {
 
     private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_guardarButtonActionPerformed
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
@@ -193,6 +233,31 @@ public class UsuariosView extends javax.swing.JFrame {
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_eliminarButtonActionPerformed
+
+    private void nombreInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nombreInputKeyReleased
+        // TODO add your handling code here:
+        String aux = nombreInput.getText();
+        nombreIsValid = utils.isStringOnlyAlphabet(aux);
+        permitirAccion();
+    }//GEN-LAST:event_nombreInputKeyReleased
+
+    private void usernameInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_usernameInputKeyReleased
+        // TODO add your handling code here:
+        String aux = usernameInput.getText();
+        usernameIsValid = !aux.equals("");
+        permitirAccion();
+    }//GEN-LAST:event_usernameInputKeyReleased
+
+    private void passwordInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordInputKeyReleased
+        // TODO add your handling code here:
+        String aux = passwordInput.getText();
+        passwordIsValid = !aux.equals("");
+        permitirAccion();
+    }//GEN-LAST:event_passwordInputKeyReleased
+
+    private void perfilInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_perfilInputKeyReleased
+
+    }//GEN-LAST:event_perfilInputKeyReleased
 
     /**
      * @param args the command line arguments
