@@ -16,6 +16,7 @@ public class ProductosView extends javax.swing.JFrame {
      */
     public ProductosView() {
         initComponents();
+        this.setLocationRelativeTo(null);
     }
 
     /**
