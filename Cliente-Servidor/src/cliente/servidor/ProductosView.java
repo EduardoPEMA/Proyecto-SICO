@@ -5,6 +5,8 @@
  */
 package cliente.servidor;
 
+import utils.Utils;
+
 /**
  *
  * @author isaac
@@ -14,9 +16,24 @@ public class ProductosView extends javax.swing.JFrame {
     /**
      * Creates new form UsuariosView
      */
+    private boolean descripcionIsValid = true;
+    private boolean stockIsValid = false;
+    private boolean precioIsValid = false;
+    private Utils utils = new Utils();
+
     public ProductosView() {
         initComponents();
         this.setLocationRelativeTo(null);
+        permitirAccion();
+    }
+
+    private boolean getEstados() {
+        return descripcionIsValid && stockIsValid && precioIsValid;
+    }
+
+    private void permitirAccion() {
+        boolean permitir = getEstados();
+        guardarButton.setEnabled(permitir);
     }
 
     /**
@@ -61,6 +78,12 @@ public class ProductosView extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Stock");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, -1, -1));
+
+        stockInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                stockInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(stockInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, 110, 40));
 
         jLabel6.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -75,6 +98,12 @@ public class ProductosView extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Usuario");
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, -1, -1));
+
+        descripcionInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                descripcionInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(descripcionInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 270, 40));
 
         buscarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
@@ -95,6 +124,12 @@ public class ProductosView extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setText("Precio");
         getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 230, -1, -1));
+
+        precioInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                precioInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(precioInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 250, 110, 40));
 
         cancelarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
@@ -174,6 +209,24 @@ public class ProductosView extends javax.swing.JFrame {
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_eliminarButtonActionPerformed
+
+    private void descripcionInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_descripcionInputKeyReleased
+        String aux = descripcionInput.getText();
+        permitirAccion();
+    }//GEN-LAST:event_descripcionInputKeyReleased
+
+    private void stockInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_stockInputKeyReleased
+        String aux = stockInput.getText();
+        stockIsValid = utils.isNumber(aux);
+        permitirAccion();
+    }//GEN-LAST:event_stockInputKeyReleased
+
+    private void precioInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_precioInputKeyReleased
+        // TODO add your handling code here:
+        String aux = precioInput.getText();
+        precioIsValid = utils.isNumber(aux);
+        permitirAccion();
+    }//GEN-LAST:event_precioInputKeyReleased
 
     /**
      * @param args the command line arguments
