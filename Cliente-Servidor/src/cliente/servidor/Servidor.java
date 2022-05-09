@@ -151,10 +151,10 @@ public class Servidor extends javax.swing.JFrame {
                                     us.setUsername(variables[2]);
                                     us.setPassword(variables[3]);
                                     DBUsuarios db = new DBUsuarios(conn);
-                                    db.login(us);
-                                    mensaje = db.buscarUsuario(us);
+                                    mensaje = db.login(us);
 
                                     if (mensaje.length() == 0) {
+                                        mensaje = "No hay resultados";
                                         mensajeAlerta = "";
                                         mostrarMensaje("Sin resultados");
                                     }
@@ -214,7 +214,7 @@ public class Servidor extends javax.swing.JFrame {
                                     DBUsuarios db = new DBUsuarios(conn);
                                     mensaje = db.login(us);
 
-                                    if (mensaje.length() == 0) {
+                                    if (mensaje.equals("")) {
                                         mensajeAlerta = "";
                                         mostrarMensaje("Sin resultados");
                                     }
