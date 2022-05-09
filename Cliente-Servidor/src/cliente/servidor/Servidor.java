@@ -105,16 +105,16 @@ public class Servidor extends javax.swing.JFrame {
                     System.out.println("Enviar-cliente " + recibirPaquete);
                     conn = con.Conexion();
                     mensaje = variables[0];
-                    switch(variables[0]) {
+                    switch (variables[0]) {
                         case "usuario": {
-                            switch(variables[1]){
+                            switch (variables[1]) {
                                 case "insertar": {
                                     mensajeAlerta = "insertado";
 
                                     us.setNombre(variables[2]);
                                     us.setUsername(variables[3]);
-                                    us.setPassword(variables[4]);
-                                    us.setRol(variables[5]);
+                                    us.setRol(variables[4]);
+                                    us.setPassword(variables[5]);
 
                                     DBUsuarios db = new DBUsuarios(conn);
                                     db.guardarUsuario(us);
@@ -126,14 +126,18 @@ public class Servidor extends javax.swing.JFrame {
                                     us.setNombre(variables[2]);
                                     DBUsuarios db = new DBUsuarios(conn);
                                     mensaje = db.buscarUsuario(us);
-
                                     if (mensaje.length() == 0) {
-                                        mensajeAlerta = "";
+                                        mensaje= "No hay resultados";
+                                        mensajeAlerta = "No hay resultados";
                                         mostrarMensaje("Sin resultados");
                                     }
                                     break;
                                 }
                                 case "editar": {
+                                    System.out.println(variables[3]);
+                                    System.out.println(variables[4]);
+                                    System.out.println(variables[5]);
+                                    System.out.println(variables[6]);
                                     mensajeAlerta = "editado";
                                     us.setNombre(variables[2]);
                                     us.setUsername(variables[3]);
@@ -147,7 +151,7 @@ public class Servidor extends javax.swing.JFrame {
                                 case "eliminar": {
                                     mensajeAlerta = "eliminar";
                                     us.setId(Integer.parseInt(variables[2]));
-                                    
+
                                     DBUsuarios db = new DBUsuarios(conn);
                                     db.eliminarUsuario(us);
                                     break;
@@ -168,9 +172,9 @@ public class Servidor extends javax.swing.JFrame {
                                 }
                             }
                             break;
-                        }  
+                        }
                         case "cliente": {
-                            switch(variables[1]){
+                            switch (variables[1]) {
                                 case "insertar": {
                                     mensajeAlerta = "insertado";
 
@@ -219,7 +223,7 @@ public class Servidor extends javax.swing.JFrame {
                             break;
                         }
                         case "producto": {
-                            switch(variables[1]){
+                            switch (variables[1]) {
                                 case "insertar": {
                                     mensajeAlerta = "insertado";
 

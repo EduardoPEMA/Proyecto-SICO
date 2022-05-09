@@ -28,12 +28,13 @@ public class DBUsuarios {
 
     public void guardarUsuario(Usuarios us) throws SQLException {
         try {
-            String sql = "INSERT INTO usuarios VALUES ( ?, ?, ?, ?)";
+            String sql = "INSERT INTO usuarios  (id, nombre, username, rol, password) VALUES (?, ?, ?, ?, ?)";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, us.getNombre());
-            ps.setString(2, us.getUsername());
-            ps.setString(3, us.getPassword());
+            ps.setString(1, null);
+            ps.setString(2, us.getNombre());
+            ps.setString(3, us.getUsername());
             ps.setString(4, us.getRol());
+            ps.setString(5, us.getPassword());
             ps.executeUpdate();
         } catch(SQLException exp){
             exp.printStackTrace();
@@ -53,9 +54,10 @@ public class DBUsuarios {
             String sql = "UPDATE usuarios\n"
                 + "SET nombre = ?,\n"
                 + "username = ?,\n"
-                + "password = ?,\n"
-                + "rol = ?\n"
+                + "rol = ?,\n"
+                + "password = ?\n"
                 + "WHERE id = ?\n";
+            System.out.println(us.getRol());
             ps = conn.prepareStatement(sql);
             ps.setString(1, us.getNombre());
             ps.setString(2, us.getUsername());
@@ -89,11 +91,12 @@ public class DBUsuarios {
     public String buscarUsuario(Usuarios us) throws SQLException {
         String result = "";
         try {
-            String sql = "SELECT * FROM usuarios WHERE id = ?";
+            String sql = "SELECT * FROM usuarios WHERE nombre = ? LIMIT 1";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, String.valueOf(us.getId()));
+            ps.setString(1, us.getNombre());
             rs = ps.executeQuery();
             while (rs.next()) {
+                System.out.println(rs.getString("rol"));
                 result += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("username")
                         + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
             }

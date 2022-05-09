@@ -88,6 +88,12 @@ public class UsuariosView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        buscarInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buscarInputActionPerformed(evt);
+            }
+        });
         getContentPane().add(buscarInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 40, 270, 40));
 
         jLabel4.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -231,11 +237,11 @@ public class UsuariosView extends javax.swing.JFrame {
     private void setEstado(Boolean state) {
         editarButton.setEnabled(state);
         eliminarButton.setEnabled(state);
-        guardarButton.setEnabled(state);
         nombreInput.setEnabled(state);
         usernameInput.setEnabled(state);
         passwordInput.setEnabled(state);
         perfilInput.setEnabled(state);
+        limpiarTexto();
     }
 
     private boolean getEstados() {
@@ -243,31 +249,17 @@ public class UsuariosView extends javax.swing.JFrame {
     }
 
     private void permitirAccion() {
+        if (!idInput.getText().equals("")) {
+            guardarButton.setEnabled(false);
+            return;
+        }
         boolean permitir = getEstados();
         guardarButton.setEnabled(permitir);
     }
     private void buscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarButtonActionPerformed
         // TODO add your handling code here:
-         try {
-//obtener mensaje del campo de texto y convertirlo en arreglo byte
-            buscarUsuario = buscarInput.getText();
-            String mensaje = "usuario" + " " + "buscar" + " " + buscarUsuario;
-            JOptionPane.showMessageDialog(null, "Buscar usuario...", "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
-            byte datos[] = mensaje.getBytes();
-            DatagramPacket enviarPaquete = new DatagramPacket(datos,
-                    datos.length, InetAddress.getLocalHost(), 5000);
-            socket.send(enviarPaquete);//enviar paquete
-        } catch (IOException exceptionES) {
-            exceptionES.printStackTrace();
-        }
-        try {
-            esperarPaquetes();
-            socket = new DatagramSocket();
-        } catch (SocketException excepcionSocket) {
-            excepcionSocket.printStackTrace();
-            System.exit(1);
-        }
+        buscar(buscarInput.getText());
+
     }//GEN-LAST:event_buscarButtonActionPerformed
 
     private void perfilInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_perfilInputActionPerformed
@@ -278,15 +270,21 @@ public class UsuariosView extends javax.swing.JFrame {
         // TODO add your handling code here:
         limpiarTexto();
         permitirAccion();
+        setEstado(false);
     }//GEN-LAST:event_cancelarButtonActionPerformed
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
         // TODO add your handling code here:
         setEstado(true);
+        if (idInput.getText().equals("")) {
+            eliminarButton.setEnabled(false);
+            editarButton.setEnabled(false);
+        }
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
     private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
         // TODO add your handling code here:
+
         try {
             nombre = nombreInput.getText();
             username = usernameInput.getText();
@@ -305,6 +303,8 @@ public class UsuariosView extends javax.swing.JFrame {
         }
         try {
             socket = new DatagramSocket();
+            buscar(usernameInput.getText());
+            guardarButton.setEnabled(false);
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
             System.exit(1);
@@ -313,13 +313,21 @@ public class UsuariosView extends javax.swing.JFrame {
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
         // TODO add your handling code here:
+        if (idInput.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "No se encontró el usuario a editar",
+                    "Error :(", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         try {
             nombre = nombreInput.getText();
             username = usernameInput.getText();
             password = passwordInput.getText();
-            perfil = perfilInput.getSelectedItem().toString();
+            perfil = perfilInput.getItemAt(perfilInput.getSelectedIndex());
+            System.out.println("perfil" + perfil);
 
-            String mensaje = "usuario" + " " + "editar" + " " + nombre + " " + username + " " + perfil + " " + password;
+            id = idInput.getText();
+
+            String mensaje = "usuario" + " " + "editar" + " " + nombre + " " + username + " " + password + " " + perfil + " " + id;
             byte datos[] = mensaje.getBytes();
             JOptionPane.showMessageDialog(null, "Editar usuario...", "Advertencia",
                     JOptionPane.WARNING_MESSAGE);
@@ -397,10 +405,15 @@ public class UsuariosView extends javax.swing.JFrame {
 
     }//GEN-LAST:event_perfilInputKeyPressed
 
+    private void buscarInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarInputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buscarInputActionPerformed
+
     private void esperarPaquetes() {
         try {
 //establecer el paquete
             byte datos[] = new byte[100];
+
             DatagramPacket recibirPaquete = new DatagramPacket(
                     datos, datos.length);
             socket.receive(recibirPaquete);//esperar un paquete
@@ -410,13 +423,19 @@ public class UsuariosView extends javax.swing.JFrame {
             }
             String cad = (new String(recibirPaquete.getData(),
                     0, recibirPaquete.getLength()));
+            if (cad.equals("No hay resultados")) {
+                JOptionPane.showMessageDialog(null, "No hay resultados.");
+                limpiarTexto();
+                return;
+            }
+            setEstado(true);
             String[] variables;
             variables = cad.split(" ");
             idInput.setText(variables[0]);
             nombreInput.setText(variables[1]);
             usernameInput.setText(variables[2]);
-            passwordInput.setText(variables[3]);
-            perfilInput.setSelectedItem(variables[4]);
+            perfilInput.setSelectedItem(variables[3]);
+            passwordInput.setText(variables[4]);
 
         } catch (IOException excepcion) {
             excepcion.printStackTrace();
@@ -431,6 +450,26 @@ public class UsuariosView extends javax.swing.JFrame {
         perfilInput.setSelectedIndex(0);
         buscarInput.setText("");
         idInput.setText("");
+    }
+
+    public void buscar(String busqueda) {
+        try {
+//obtener mensaje del campo de texto y convertirlo en arreglo byte
+            String mensaje = "usuario" + " " + "buscar" + " " + busqueda;
+            byte datos[] = mensaje.getBytes();
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete);//enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            esperarPaquetes();
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }
 
     /**
