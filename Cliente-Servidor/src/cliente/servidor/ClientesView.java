@@ -230,7 +230,7 @@ public class ClientesView extends javax.swing.JFrame {
     private void telefonoInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_telefonoInputKeyReleased
         // TODO add your handling code here:
         String aux = telefonoInput.getText();
-        telefonoIsValid = utils.isNumber(aux);
+        telefonoIsValid = utils.isPhoneNumber(aux);
         permitirAccion();
     }//GEN-LAST:event_telefonoInputKeyReleased
 

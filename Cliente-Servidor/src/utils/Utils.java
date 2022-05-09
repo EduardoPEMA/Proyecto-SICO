@@ -17,9 +17,16 @@ public final class Utils {
                 && (str.matches("^[a-zA-Z]*$")));
     }
     
-    public static boolean isNumber(String str) {
+    public static boolean isPhoneNumber(String str) {
         return ((!str.equals(""))
                 && (str != null)
                 && (str.matches("^\\s*(?:\\+?(\\d{1,3}))?[-. (]*(\\d{3})[-. )]*(\\d{3})[-. ]*(\\d{4})(?: *x(\\d+))?\\s*$")));
     }
+    
+    public static boolean isNumber(String str) {
+        return ((!str.equals(""))
+                && (str != null)
+                && (str.matches("\\d{1,10}")));
+    }
+    
 }
