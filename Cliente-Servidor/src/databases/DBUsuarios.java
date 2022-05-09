@@ -20,71 +20,123 @@ public class DBUsuarios {
     Conexion con;
     Connection conn;
     ResultSet rs;
+    PreparedStatement ps = null;
 
     public DBUsuarios(Connection conn) {
         this.conn = conn;
     }
 
     public void guardarUsuario(Usuarios us) throws SQLException {
-        String sql = "INSERT INTO usuarios VALUES ( ?, ?, ?, ?)";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, us.getNombre());
-        stmt.setString(2, us.getUsername());
-        stmt.setString(3, us.getPassword());
-        stmt.setString(4, us.getRol());
-        stmt.executeUpdate();
+        try {
+            String sql = "INSERT INTO usuarios VALUES ( ?, ?, ?, ?)";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, us.getNombre());
+            ps.setString(2, us.getUsername());
+            ps.setString(3, us.getPassword());
+            ps.setString(4, us.getRol());
+            ps.executeUpdate();
+        } catch(SQLException exp){
+            exp.printStackTrace();
+        }
+        finally{
+            try{
+                ps.close();
+                conn.close();
+            }catch(SQLException exp){
+                exp.printStackTrace();
+            }
+        }
+        
     }
 
     public void editarUsuario(Usuarios us) throws SQLException {
-        String sql = "UPDATE usuarios\n"
+        try {
+            String sql = "UPDATE usuarios\n"
                 + "SET nombre = ?,\n"
                 + "username = ?,\n"
                 + "password = ?,\n"
                 + "rol = ?\n"
                 + "WHERE id = ?\n";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, us.getNombre());
-        stmt.setString(2, us.getUsername());
-        stmt.setString(3, us.getRol());
-        stmt.setString(4, us.getPassword());
-        stmt.setString(5, String.valueOf(us.getId()));
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, us.getNombre());
+            ps.setString(2, us.getUsername());
+            ps.setString(3, us.getRol());
+            ps.setString(4, us.getPassword());
+            ps.setString(5, String.valueOf(us.getId()));
 
-        stmt.executeUpdate();
+            ps.executeUpdate();
+        }catch(SQLException exp){
+            exp.printStackTrace();
+        }
+        finally{
+            try{
+                ps.close();
+                conn.close();
+            }catch(SQLException exp){
+                exp.printStackTrace();
+            }
+        }
+        
     }
 
     public void eliminarUsuario(Usuarios us) throws SQLException {
         String sql = "DELETE FROM usuarios\n"
                 + " WHERE id = ?\n";
 
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, String.valueOf(us.getId()));
-        stmt.executeUpdate();
+        ps = conn.prepareStatement(sql);
+        ps.setString(1, String.valueOf(us.getId()));
+        ps.executeUpdate();
     }
 
     public String buscarUsuario(Usuarios us) throws SQLException {
         String result = "";
-        String sql = "SELECT * FROM usuarios WHERE id = ?";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, String.valueOf(us.getId()));
-        rs = stmt.executeQuery();
-        while (rs.next()) {
-            result += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("username")
-                    + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
+        try {
+            String sql = "SELECT * FROM usuarios WHERE id = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, String.valueOf(us.getId()));
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                result += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("username")
+                        + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
+            }
+        }catch(SQLException exp){
+            exp.printStackTrace();
         }
+        finally{
+            try{
+                ps.close();
+                conn.close();
+            }catch(SQLException exp){
+                exp.printStackTrace();
+            }
+        }
+        
         return result;
     }
     
     public String login(Usuarios us) throws SQLException {
         String res = "";
+        try {
         
-        String sql = "select * from usuarios where username=? and password=?";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, String.valueOf(us.getUsername()));
-        stmt.setString(2, String.valueOf(us.getPassword()));
-        rs = stmt.executeQuery();
-        while (rs.next()) {
-            res += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("username")
-                    + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
+            String sql = "select * from usuarios where username=? and password=?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, String.valueOf(us.getUsername()));
+            ps.setString(2, String.valueOf(us.getPassword()));
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                res += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("username")
+                        + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
+            }
+        } catch(SQLException exp){
+            exp.printStackTrace();
+        }
+        finally{
+            try{
+                ps.close();
+                conn.close();
+            }catch(SQLException exp){
+                exp.printStackTrace();
+            }
         }
         return res;
     }

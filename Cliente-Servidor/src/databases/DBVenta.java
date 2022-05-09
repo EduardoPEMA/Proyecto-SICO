@@ -27,7 +27,7 @@ public class DBVenta {
         this.conn = conn;
     }
 
-    public void guardarProducto(Venta venta) throws SQLException {
+    public void guardarVenta(Venta venta) throws SQLException {
         String sql = "INSERT INTO ventas VALUES (?, ?, ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, venta.getFolio());
@@ -74,6 +74,13 @@ public class DBVenta {
                     + " " + rs.getString("total") + " " + rs.getString("cliente_id") + " \n";
         }
         return result;
+    }
+    
+    
+    public String vender(Venta venta, Producto pro) throws SQLException {
+        String res = "";
+        String sql = "";
+        return "";
     }
 
 }
