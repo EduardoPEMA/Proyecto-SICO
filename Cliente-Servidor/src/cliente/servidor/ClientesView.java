@@ -232,6 +232,7 @@ public class ClientesView extends javax.swing.JFrame {
         String aux = telefonoInput.getText();
         telefonoIsValid = utils.isPhoneNumber(aux);
         permitirAccion();
+        
     }//GEN-LAST:event_telefonoInputKeyReleased
 
     /**
