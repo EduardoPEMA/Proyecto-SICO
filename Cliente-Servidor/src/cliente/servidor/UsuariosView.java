@@ -5,6 +5,15 @@
  */
 package cliente.servidor;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import utils.Utils;
 
 /**
@@ -16,15 +25,34 @@ public class UsuariosView extends javax.swing.JFrame {
     /**
      * Creates new form UsuariosView
      */
+    private String nombre = "";
+    private String id = "";
+    private String buscarUsuario = "";
+    private String password = "";
+    private String username = "";
+    private String perfil = "";
     private boolean nombreIsValid = false;
     private boolean passwordIsValid = false;
     private boolean usernameIsValid = false;
     private Utils utils = new Utils();
+    public Connection connection;
+    Conexion conexion;
+    private DatagramSocket socket;
 
     public UsuariosView() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-        permitirAccion();
+        try {
+            initComponents();
+            this.setLocationRelativeTo(null);
+            setEstado(false);
+            permitirAccion();
+            conexion = new Conexion();
+            socket = new DatagramSocket();
+            idInput.setEnabled(false);
+
+        } catch (SocketException ex) {
+            Logger.getLogger(UsuariosView.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
     }
 
     /**
@@ -130,13 +158,16 @@ public class UsuariosView extends javax.swing.JFrame {
         jLabel10.setText("Perfil");
         getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 300, -1, -1));
 
-        perfilInput.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Admin", "Supervisor", "Cajero", " " }));
+        perfilInput.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "admin", "supervisor", "cajero" }));
         perfilInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 perfilInputActionPerformed(evt);
             }
         });
         perfilInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                perfilInputKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 perfilInputKeyReleased(evt);
             }
@@ -197,16 +228,46 @@ public class UsuariosView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private boolean getEstados(){
+    private void setEstado(Boolean state) {
+        editarButton.setEnabled(state);
+        eliminarButton.setEnabled(state);
+        guardarButton.setEnabled(state);
+        nombreInput.setEnabled(state);
+        usernameInput.setEnabled(state);
+        passwordInput.setEnabled(state);
+        perfilInput.setEnabled(state);
+    }
+
+    private boolean getEstados() {
         return nombreIsValid && passwordIsValid && usernameIsValid;
     }
-    
-    private void permitirAccion(){
+
+    private void permitirAccion() {
         boolean permitir = getEstados();
         guardarButton.setEnabled(permitir);
     }
     private void buscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarButtonActionPerformed
         // TODO add your handling code here:
+         try {
+//obtener mensaje del campo de texto y convertirlo en arreglo byte
+            buscarUsuario = buscarInput.getText();
+            String mensaje = "usuario" + " " + "buscar" + " " + buscarUsuario;
+            JOptionPane.showMessageDialog(null, "Buscar usuario...", "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+            byte datos[] = mensaje.getBytes();
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete);//enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            esperarPaquetes();
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }//GEN-LAST:event_buscarButtonActionPerformed
 
     private void perfilInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_perfilInputActionPerformed
@@ -215,23 +276,95 @@ public class UsuariosView extends javax.swing.JFrame {
 
     private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
         // TODO add your handling code here:
+        limpiarTexto();
+        permitirAccion();
     }//GEN-LAST:event_cancelarButtonActionPerformed
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
         // TODO add your handling code here:
+        setEstado(true);
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
     private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
         // TODO add your handling code here:
-        
+        try {
+            nombre = nombreInput.getText();
+            username = usernameInput.getText();
+            password = passwordInput.getText();
+            perfil = perfilInput.getSelectedItem().toString();
+
+            String mensaje = "usuario" + " " + "insertar" + " " + nombre + " " + username + " " + perfil + " " + password;
+            byte datos[] = mensaje.getBytes();
+            JOptionPane.showMessageDialog(null, "Guardar usuario...", "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete);//enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }//GEN-LAST:event_guardarButtonActionPerformed
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
         // TODO add your handling code here:
+        try {
+            nombre = nombreInput.getText();
+            username = usernameInput.getText();
+            password = passwordInput.getText();
+            perfil = perfilInput.getSelectedItem().toString();
+
+            String mensaje = "usuario" + " " + "editar" + " " + nombre + " " + username + " " + perfil + " " + password;
+            byte datos[] = mensaje.getBytes();
+            JOptionPane.showMessageDialog(null, "Editar usuario...", "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete);//enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }//GEN-LAST:event_editarButtonActionPerformed
 
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
         // TODO add your handling code here:
+        if (idInput.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "No se encontró el usuario a eliminar",
+                    "Error :(", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            id = idInput.getText();
+            String mensaje = "usuario" + " " + "eliminar" + " " + id;
+            byte datos[] = mensaje.getBytes();
+//crear enviarPaquete
+            JOptionPane.showMessageDialog(null, "Eliminar usuario...", "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete);//enviar paquete
+            limpiarTexto();
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            socket = new DatagramSocket();
+        } //atrapar los problemas que puedan ocurrir al crear objeto DatagramSocket
+        catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }//GEN-LAST:event_eliminarButtonActionPerformed
 
     private void nombreInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nombreInputKeyReleased
@@ -258,6 +391,47 @@ public class UsuariosView extends javax.swing.JFrame {
     private void perfilInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_perfilInputKeyReleased
 
     }//GEN-LAST:event_perfilInputKeyReleased
+
+    private void perfilInputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_perfilInputKeyPressed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_perfilInputKeyPressed
+
+    private void esperarPaquetes() {
+        try {
+//establecer el paquete
+            byte datos[] = new byte[100];
+            DatagramPacket recibirPaquete = new DatagramPacket(
+                    datos, datos.length);
+            socket.receive(recibirPaquete);//esperar un paquete
+            if (recibirPaquete.getLength() == 0) {
+                limpiarTexto();
+                this.dispose();
+            }
+            String cad = (new String(recibirPaquete.getData(),
+                    0, recibirPaquete.getLength()));
+            String[] variables;
+            variables = cad.split(" ");
+            idInput.setText(variables[0]);
+            nombreInput.setText(variables[1]);
+            usernameInput.setText(variables[2]);
+            passwordInput.setText(variables[3]);
+            perfilInput.setSelectedItem(variables[4]);
+
+        } catch (IOException excepcion) {
+            excepcion.printStackTrace();
+        }
+
+    }//fin
+
+    public void limpiarTexto() {
+        nombreInput.setText("");
+        usernameInput.setText("");
+        passwordInput.setText("");
+        perfilInput.setSelectedIndex(0);
+        buscarInput.setText("");
+        idInput.setText("");
+    }
 
     /**
      * @param args the command line arguments
