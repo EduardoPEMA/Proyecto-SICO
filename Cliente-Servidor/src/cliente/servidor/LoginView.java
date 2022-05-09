@@ -55,7 +55,36 @@ public class LoginView extends javax.swing.JFrame {
     }
 
     private void esperarPaquetes() {
-        
+        try {
+            //establecer el paquete
+            byte datos[] = new byte[100];
+            DatagramPacket recibirPaquete = new DatagramPacket(
+                    datos, datos.length);
+            socket.receive(recibirPaquete); //esperar un paquete
+            
+            if (recibirPaquete.getLength() == 0) {
+                return;
+            }
+            
+            String cad = (new String(recibirPaquete.getData(),
+                    0, recibirPaquete.getLength()));
+            
+            if(cad.equals("No hay resultados")) {
+                JOptionPane.showMessageDialog(null, "Verifica las credenciales. "
+                        + "Los datos ingresados no son correctos");
+                return;
+            }
+            String[] variables;
+            variables = cad.split(" ");
+            
+            Navigation nav = new Navigation();
+            nav.setNavigation(variables[3]);
+            nav.show();
+            this.dispose();
+
+        } catch (IOException excepcion) {
+            excepcion.printStackTrace();
+        }
 
     }//fin
 
@@ -134,7 +163,6 @@ public class LoginView extends javax.swing.JFrame {
             String user = userInput.getText();
             String psw = passwordInput.getText();
             String mensaje = "usuario" + " " + "login" + " " + user + " " + psw;
-            JOptionPane.showMessageDialog(null, mensaje);
             byte datos[] = mensaje.getBytes();
             DatagramPacket enviarPaquete = new DatagramPacket(datos,
                     datos.length, InetAddress.getLocalHost(), 5000);

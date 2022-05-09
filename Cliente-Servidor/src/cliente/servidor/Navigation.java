@@ -27,9 +27,14 @@ public class Navigation extends javax.swing.JFrame {
         this.ventasButton.setEnabled(false);
     }
     
-        public void setNavigation(Usuarios u) {
-        user = u;
-            switch (u.getRol()) {
+        public void setNavigation(String rol) {
+            switch (rol) {
+                case "admin":
+                    this.usuariosButton.setEnabled(true);
+                    this.clientesButton.setEnabled(true);
+                    this.productosButton.setEnabled(true);
+                    this.ventasButton.setEnabled(true);
+                    break;
                 case "cajero":
                     this.clientesButton.setEnabled(true);
                     this.ventasButton.setEnabled(true);
