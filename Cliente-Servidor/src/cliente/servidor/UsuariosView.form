@@ -203,16 +203,16 @@
     <Component class="javax.swing.JComboBox" name="perfilInput">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="4">
-            <StringItem index="0" value="Admin"/>
-            <StringItem index="1" value="Supervisor"/>
-            <StringItem index="2" value="Cajero"/>
-            <StringItem index="3" value=" "/>
+          <StringArray count="3">
+            <StringItem index="0" value="admin"/>
+            <StringItem index="1" value="supervisor"/>
+            <StringItem index="2" value="cajero"/>
           </StringArray>
         </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="perfilInputActionPerformed"/>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="perfilInputKeyPressed"/>
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="perfilInputKeyReleased"/>
       </Events>
       <AuxValues>
