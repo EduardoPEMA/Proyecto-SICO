@@ -25,6 +25,7 @@ public class ProductosView extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         permitirAccion();
+        
     }
 
     private boolean getEstados() {
