@@ -45,7 +45,7 @@ public class DBProducto {
         stmt.setString(1, pro.getDescripcion());
         stmt.setString(2, pro.getStock());
         stmt.setString(3, pro.getPrecio());
-        stmt.setString(5, String.valueOf(pro.getId()));
+        stmt.setString(4, String.valueOf(pro.getId()));
 
         stmt.executeUpdate();
     }

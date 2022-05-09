@@ -7,8 +7,53 @@ package classes;
 
 /**
  *
- * @author cesar
+ * @author Cesar
  */
 public class Venta {
+    private int id;
+    private String folio;
+    private String fecha;
+    private String total;
+    private String cliente_id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getFolio() {
+        return folio;
+    }
+
+    public void setFolio(String folio) {
+        this.folio = folio;
+    }
+
+    public String getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    } 
+
+    public String getTotal() {
+        return total;
+    }
+
+    public void setTotal(String total) {
+        this.total = total;
+    }
+    
+    public String getCliente() {
+        return cliente_id;
+    }
+
+    public void setCliente(String cliente_id) {
+        this.cliente_id = cliente_id;
+    }
     
 }

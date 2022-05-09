@@ -43,7 +43,7 @@ public class Producto {
         return precio;
     }
 
-    public void setPrecio(String rfc) {
+    public void setPrecio(String precio) {
         this.precio = precio;
     }
     

@@ -139,15 +139,15 @@ public class Servidor extends javax.swing.JFrame {
                                 }
                                 case "eliminar": {
                                     mensajeAlerta = "eliminar";
-                                    us.setUsername(variables[1]);
+                                    us.setUsername(variables[2]);
                                     DBUsuarios db = new DBUsuarios(conn);
                                     db.eliminarUsuario(us);
                                     break;
                                 }
                                 case "login": {
                                     mensajeAlerta = "login";
-                                    us.setUsername(variables[1]);
-                                    us.setPassword(variables[2]);
+                                    us.setUsername(variables[2]);
+                                    us.setPassword(variables[3]);
                                     DBUsuarios db = new DBUsuarios(conn);
                                     db.login(us);
                                     mensaje = db.buscarUsuario(us);
