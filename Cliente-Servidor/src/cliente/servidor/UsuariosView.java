@@ -303,7 +303,7 @@ public class UsuariosView extends javax.swing.JFrame {
         }
         try {
             socket = new DatagramSocket();
-            buscar(usernameInput.getText());
+            buscar(nombreInput.getText());
             guardarButton.setEnabled(false);
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
