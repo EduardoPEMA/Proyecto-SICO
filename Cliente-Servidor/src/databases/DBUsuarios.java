@@ -41,7 +41,6 @@ public class DBUsuarios {
         finally{
             try{
                 ps.close();
-                conn.close();
             }catch(SQLException exp){
                 exp.printStackTrace();
             }
@@ -71,7 +70,6 @@ public class DBUsuarios {
         finally{
             try{
                 ps.close();
-                conn.close();
             }catch(SQLException exp){
                 exp.printStackTrace();
             }
@@ -105,7 +103,6 @@ public class DBUsuarios {
         finally{
             try{
                 ps.close();
-                conn.close();
             }catch(SQLException exp){
                 exp.printStackTrace();
             }
@@ -120,8 +117,8 @@ public class DBUsuarios {
         
             String sql = "select * from usuarios where username=? and password=?";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, String.valueOf(us.getUsername()));
-            ps.setString(2, String.valueOf(us.getPassword()));
+            ps.setString(1, us.getUsername());
+            ps.setString(2, us.getPassword());
             rs = ps.executeQuery();
             while (rs.next()) {
                 res += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("username")
@@ -133,7 +130,6 @@ public class DBUsuarios {
         finally{
             try{
                 ps.close();
-                conn.close();
             }catch(SQLException exp){
                 exp.printStackTrace();
             }

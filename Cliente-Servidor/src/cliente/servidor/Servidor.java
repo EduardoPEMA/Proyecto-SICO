@@ -5,6 +5,7 @@
  */
 package cliente.servidor;
 
+import classes.Clientes;
 import classes.Usuarios;
 import databases.DBUsuarios;
 import java.io.*;
@@ -96,6 +97,7 @@ public class Servidor extends javax.swing.JFrame {
                     String[] variables;
                     variables = cad.split(" ");
                     Usuarios us = new Usuarios();
+                    Clientes cli = new Clientes();
                     System.out.println("Enviar-cliente " + recibirPaquete);
                     conn = con.Conexion();
                     mensaje = variables[0];
@@ -160,31 +162,68 @@ public class Servidor extends javax.swing.JFrame {
                                 }
                             }
                             break;
-                        }       
-                    }
-                    if (variables[0].equals("editar")) {
-                        
+                        }  
+                        case "cliente": {
+                            switch(variables[1]){
+                                case "insertar": {
+                                    mensajeAlerta = "insertado";
 
-                    }
+                                    us.setNombre(variables[2]);
+                                    us.setUsername(variables[3]);
+                                    us.setPassword(variables[4]);
+                                    us.setRol(variables[5]);
 
-                    if (variables[0].equals("eliminar")) {
-                        
-                    }
-                    
-                    if(variables[0].equals("login")) {
-                        mensajeAlerta = "login";
-                        us.setUsername(variables[1]);
-                        us.setPassword(variables[2]);
-                        DBUsuarios db = new DBUsuarios(conn);
-                        db.login(us);
-                        mensaje = db.buscarUsuario(us);
+                                    DBUsuarios db = new DBUsuarios(conn);
+                                    db.guardarUsuario(us);
+                                    break;
+                                }
+                                case "buscar": {
+                                    result = "";
+                                    mensajeAlerta = "encontrado";
+                                    us.setNombre(variables[2]);
+                                    DBUsuarios db = new DBUsuarios(conn);
+                                    mensaje = db.buscarUsuario(us);
 
-                        if (mensaje.length() == 0) {
-                            mensajeAlerta = "";
-                            mostrarMensaje("Sin resultados");
+                                    if (mensaje.length() == 0) {
+                                        mensajeAlerta = "";
+                                        mostrarMensaje("Sin resultados");
+                                    }
+                                    break;
+                                }
+                                case "editar": {
+                                    mensajeAlerta = "editado";
+                                    us.setNombre(variables[2]);
+                                    us.setUsername(variables[3]);
+                                    us.setPassword(variables[4]);
+                                    us.setRol(variables[5]);
+                                    DBUsuarios db = new DBUsuarios(conn);
+                                    db.editarUsuario(us);
+                                    break;
+                                }
+                                case "eliminar": {
+                                    mensajeAlerta = "eliminar";
+                                    us.setUsername(variables[2]);
+                                    DBUsuarios db = new DBUsuarios(conn);
+                                    db.eliminarUsuario(us);
+                                    break;
+                                }
+                                case "login": {
+                                    mensajeAlerta = "login";
+                                    us.setUsername(variables[2]);
+                                    us.setPassword(variables[3]);
+                                    DBUsuarios db = new DBUsuarios(conn);
+                                    mensaje = db.login(us);
+
+                                    if (mensaje.length() == 0) {
+                                        mensajeAlerta = "";
+                                        mostrarMensaje("Sin resultados");
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
                         }
                     }
-
                 }
                 //mostrar la informacion del paquete recibido
                 if (mensajeAlerta.length() > 0) {
