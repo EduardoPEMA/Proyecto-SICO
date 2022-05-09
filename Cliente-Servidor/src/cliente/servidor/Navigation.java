@@ -5,6 +5,8 @@
  */
 package cliente.servidor;
 
+import classes.Usuarios;
+
 /**
  *
  * @author isaac
@@ -14,10 +16,33 @@ public class Navigation extends javax.swing.JFrame {
     /**
      * Creates new form UsuariosView
      */
+    private Usuarios user;
+    
     public Navigation() {
         initComponents();
         this.setLocationRelativeTo(null);
+        this.usuariosButton.setEnabled(false);
+        this.clientesButton.setEnabled(false);
+        this.productosButton.setEnabled(false);
+        this.ventasButton.setEnabled(false);
     }
+    
+        public void setNavigation(Usuarios u) {
+        user = u;
+            switch (u.getRol()) {
+                case "cajero":
+                    this.clientesButton.setEnabled(true);
+                    this.ventasButton.setEnabled(true);
+                    break;
+                case "supervisor":
+                    this.usuariosButton.setEnabled(true);
+                    this.productosButton.setEnabled(true);
+                    break;
+                default:
+                    break;
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -28,76 +53,86 @@ public class Navigation extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        nuevoButton = new javax.swing.JButton();
+        productosButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+        clientesButton = new javax.swing.JButton();
+        usuariosButton = new javax.swing.JButton();
+        ventasButton = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        nuevoButton1 = new javax.swing.JButton();
-        nuevoButton2 = new javax.swing.JButton();
-        nuevoButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        nuevoButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        nuevoButton.setText("Nuevo");
-        nuevoButton.addActionListener(new java.awt.event.ActionListener() {
+        productosButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        productosButton.setText("Productos");
+        productosButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nuevoButtonActionPerformed(evt);
+                productosButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(nuevoButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 390, 210, 50));
+        getContentPane().add(productosButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 210, 50));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/whiteLogo.png"))); // NOI18N
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 20, 170, 160));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 170, 160));
+
+        clientesButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        clientesButton.setText("Clientes");
+        clientesButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clientesButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(clientesButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 290, 210, 50));
+
+        usuariosButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        usuariosButton.setText("Usuarios");
+        usuariosButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usuariosButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(usuariosButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 230, 210, 50));
+
+        ventasButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        ventasButton.setText("Ventas");
+        ventasButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ventasButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(ventasButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 410, 210, 50));
+
+        jLabel4.setFont(new java.awt.Font("Bahnschrift", 1, 36)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("Bienvenido!");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 200, 50));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/bg-dblue.jpg"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-720, 360, 830, 480));
-
-        nuevoButton1.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        nuevoButton1.setText("Clientes");
-        nuevoButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nuevoButton1ActionPerformed(evt);
-            }
-        });
-        getContentPane().add(nuevoButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 310, 210, 50));
-
-        nuevoButton2.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        nuevoButton2.setText("Clientes");
-        nuevoButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nuevoButton2ActionPerformed(evt);
-            }
-        });
-        getContentPane().add(nuevoButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 310, 210, 50));
-
-        nuevoButton3.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        nuevoButton3.setText("Nuevo");
-        nuevoButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nuevoButton3ActionPerformed(evt);
-            }
-        });
-        getContentPane().add(nuevoButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 390, 210, 50));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 250, 480));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nuevoButtonActionPerformed
+    private void productosButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productosButtonActionPerformed
+        ProductosView products = new ProductosView();
+        products.show();
+    }//GEN-LAST:event_productosButtonActionPerformed
 
-    private void nuevoButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nuevoButton1ActionPerformed
+    private void clientesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientesButtonActionPerformed
+        ClientesView clients = new ClientesView();
+        clients.show();
+    }//GEN-LAST:event_clientesButtonActionPerformed
 
-    private void nuevoButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nuevoButton2ActionPerformed
+    private void usuariosButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usuariosButtonActionPerformed
+        UsuariosView users = new UsuariosView();
+        users.show();
+    }//GEN-LAST:event_usuariosButtonActionPerformed
 
-    private void nuevoButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nuevoButton3ActionPerformed
+    private void ventasButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ventasButtonActionPerformed
+        VentasView ventas = new VentasView();
+        ventas.show();
+    }//GEN-LAST:event_ventasButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -142,11 +177,12 @@ public class Navigation extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton clientesButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JButton nuevoButton;
-    private javax.swing.JButton nuevoButton1;
-    private javax.swing.JButton nuevoButton2;
-    private javax.swing.JButton nuevoButton3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JButton productosButton;
+    private javax.swing.JButton usuariosButton;
+    private javax.swing.JButton ventasButton;
     // End of variables declaration//GEN-END:variables
 }

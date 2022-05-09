@@ -5,6 +5,16 @@
  */
 package cliente.servidor;
 
+import classes.Usuarios;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import utils.Utils;
 
 /**
@@ -12,18 +22,29 @@ import utils.Utils;
  * @author isaac
  */
 public class LoginView extends javax.swing.JFrame {
+
     private boolean usernameIsValid = false;
     private boolean passwordIsValid = false;
-    private Utils utils = new Utils();
+    Conexion con;
+    public Connection conn;
+    private DatagramSocket socket;
+
     /**
      * Creates new form Login
      */
     public LoginView() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-        permitirAccion();
+        try {
+            initComponents();
+            permitirAccion();
+            con = new Conexion();
+            socket = new DatagramSocket();
+            this.setLocationRelativeTo(null);
+
+        } catch (SocketException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
     private boolean getEstados() {
         return usernameIsValid && passwordIsValid;
     }
@@ -32,8 +53,11 @@ public class LoginView extends javax.swing.JFrame {
         boolean permitir = getEstados();
         iniciarButton.setEnabled(permitir);
     }
-    
-    
+
+    private void esperarPaquetes() {
+        
+
+    }//fin
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -105,15 +129,26 @@ public class LoginView extends javax.swing.JFrame {
 
     private void iniciarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iniciarButtonActionPerformed
         // TODO add your handling code here:
-        String usuario = userInput.getText();
-        String psw;
-        
-         guests guestWindow;
-            guestWindow = new guests();
-            guestWindow.setGuests(database, employee);
-            guestWindow.show();
-            this.dispose();
-        
+        try {
+            //obtener mensaje del campo de texto y convertirlo en arreglo byte
+            String user = userInput.getText();
+            String psw = passwordInput.getText();
+            String mensaje = "usuario" + " " + "login" + " " + user + " " + psw;
+            JOptionPane.showMessageDialog(null, mensaje);
+            byte datos[] = mensaje.getBytes();
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete); //enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            esperarPaquetes();
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }//GEN-LAST:event_iniciarButtonActionPerformed
 
     private void userInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userInputActionPerformed
