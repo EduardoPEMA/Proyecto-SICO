@@ -26,13 +26,12 @@ public class DBUsuarios {
     }
 
     public void guardarUsuario(Usuarios us) throws SQLException {
-        String sql = "INSERT INTO usuarios VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO usuarios VALUES ( ?, ?, ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, us.getNombre());
         stmt.setString(2, us.getUsername());
         stmt.setString(3, us.getPassword());
         stmt.setString(4, us.getRol());
-        stmt.setString(5, null);
         stmt.executeUpdate();
     }
 
@@ -73,6 +72,21 @@ public class DBUsuarios {
                     + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
         }
         return result;
+    }
+    
+    public String login(Usuarios us) throws SQLException {
+        String res = "";
+        
+        String sql = "select * from usuarios where username=? and password=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, String.valueOf(us.getUsername()));
+        stmt.setString(2, String.valueOf(us.getPassword()));
+        rs = stmt.executeQuery();
+        while (rs.next()) {
+            res += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("username")
+                    + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
+        }
+        return res;
     }
 
 }
