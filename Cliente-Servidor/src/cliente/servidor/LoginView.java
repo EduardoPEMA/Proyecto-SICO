@@ -5,19 +5,35 @@
  */
 package cliente.servidor;
 
+import utils.Utils;
+
 /**
  *
  * @author isaac
  */
 public class LoginView extends javax.swing.JFrame {
-
+    private boolean usernameIsValid = false;
+    private boolean passwordIsValid = false;
+    private Utils utils = new Utils();
     /**
      * Creates new form Login
      */
     public LoginView() {
         initComponents();
         this.setLocationRelativeTo(null);
+        permitirAccion();
     }
+    
+    private boolean getEstados() {
+        return usernameIsValid && passwordIsValid;
+    }
+
+    private void permitirAccion() {
+        boolean permitir = getEstados();
+        iniciarButton.setEnabled(permitir);
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -28,7 +44,7 @@ public class LoginView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
+        iniciarButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         passwordInput = new javax.swing.JTextField();
         userInput = new javax.swing.JTextField();
@@ -39,19 +55,36 @@ public class LoginView extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jButton1.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        jButton1.setText("Iniciar Sesión");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        iniciarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        iniciarButton.setText("Iniciar Sesión");
+        iniciarButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                iniciarButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 360, 160, 30));
+        getContentPane().add(iniciarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 360, 160, 30));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/whiteLogo.png"))); // NOI18N
         jLabel2.setText("jLabel2");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 30, 160, 130));
+
+        passwordInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                passwordInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(passwordInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 270, 270, 40));
+
+        userInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userInputActionPerformed(evt);
+            }
+        });
+        userInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                userInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(userInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 200, 270, 40));
 
         jLabel3.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -70,9 +103,36 @@ public class LoginView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void iniciarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iniciarButtonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+        String usuario = userInput.getText();
+        String psw;
+        
+         guests guestWindow;
+            guestWindow = new guests();
+            guestWindow.setGuests(database, employee);
+            guestWindow.show();
+            this.dispose();
+        
+    }//GEN-LAST:event_iniciarButtonActionPerformed
+
+    private void userInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userInputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_userInputActionPerformed
+
+    private void userInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_userInputKeyReleased
+        // TODO add your handling code here:
+        String aux = userInput.getText();
+        usernameIsValid = !aux.equals("");
+        permitirAccion();
+    }//GEN-LAST:event_userInputKeyReleased
+
+    private void passwordInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordInputKeyReleased
+        // TODO add your handling code here:
+        String aux = passwordInput.getText();
+        passwordIsValid = !aux.equals("");
+        permitirAccion();
+    }//GEN-LAST:event_passwordInputKeyReleased
 
     /**
      * @param args the command line arguments
@@ -113,7 +173,7 @@ public class LoginView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton iniciarButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
