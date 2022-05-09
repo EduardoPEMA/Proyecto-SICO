@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package databases;
+package cliente.servidor;
 
-import cliente.servidor.Conexion;
-import cliente.servidor.Usuarios;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,48 +26,48 @@ public class DBUsuarios {
     public void guardarUsuario(Usuarios us) throws SQLException {
         String sql = "INSERT INTO usuarios VALUES (?, ?, ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
-
-        stmt.setString(1, null);
-        stmt.setString(2, us.getNombre());
-        stmt.setString(3, us.getUsername());
-        stmt.setString(4, us.getPassword());
-        stmt.setString(5, us.getRol());
+        System.out.println(stmt);
+        System.out.println(us.getNombre_usuario());
+        System.out.println(us.getPassword());
+        System.out.println(us.getNombre_perfil());
+        stmt.setString(1, us.getNombre_usuario());
+        stmt.setString(2, us.getPassword());
+        stmt.setString(3, us.getNombre_perfil());
+        stmt.setString(4, null);
         stmt.executeUpdate();
     }
 
     public void editarUsuario(Usuarios us) throws SQLException {
         String sql = "UPDATE usuarios\n"
-                + "SET nombre = ?,\n"
-                + "username =    ?,\n"
-                + "rol =    ?,\n"
+                + "SET perfil = ?,\n"
                 + "password = ?\n"
-                + "WHERE nombre = ?\n";
+                + "WHERE nombre_usuario = ?\n";
         PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, us.getNombre());
-        stmt.setString(2, us.getUsername());
-        stmt.setString(3, us.getRol());
-        stmt.setString(4, us.getPassword());
+        stmt.setString(1, us.getNombre_perfil());
+        stmt.setString(2, us.getPassword());
+        stmt.setString(3, us.getNombre_usuario());
 
         stmt.executeUpdate();
     }
 
     public void eliminarUsuario(Usuarios us) throws SQLException {
         String sql = "DELETE FROM usuarios\n"
-                + " WHERE id = ?\n";
+                + " WHERE nombre_usuario = ?\n";
+
         PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, String.valueOf(us.getId()));
+        stmt.setString(1, us.getNombre_usuario());
         stmt.executeUpdate();
     }
 
     public String buscarUsuario(Usuarios us) throws SQLException {
         String result = "";
-        String sql = "SELECT * FROM usuarios WHERE nombre = ?";
+        String sql = "SELECT * FROM usuarios WHERE nombre_usuario = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, us.getNombre());
         rs = stmt.executeQuery();
         while (rs.next()) {
-            result += rs.getString("nombre") + " " + rs.getString("username")
-                    + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
+            result += rs.getString("nombre_usuario") + " " + rs.getString("perfil")
+                    + " " + rs.getString("password") + " \n";
         }
         return result;
     }

@@ -5,18 +5,22 @@
  */
 package cliente.servidor;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  *
  * @author Eduardo
  */
 public class Usuarios {
     private int usuario_id;
-    private int id;
     private String nombre;
-    private String username;
+    private String apellido_paterno;
+    private String apellido_materno;
     private String telefono;
+    private String nombre_usuario;
     private String password;
-    private String rol;
+    private String nombre_perfil;
+
 
     public int getUsuario_id() {
         return usuario_id;
@@ -24,14 +28,6 @@ public class Usuarios {
 
     public void setUsuario_id(int usuario_id) {
         this.usuario_id = usuario_id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getNombre() {
@@ -42,20 +38,20 @@ public class Usuarios {
         this.nombre = nombre;
     }
 
-    public String getPassword() {
-        return password;
+    public String getApellido_paterno() {
+        return apellido_paterno;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setApellido_paterno(String apellido_paterno) {
+        this.apellido_paterno = apellido_paterno;
     }
 
-    public String getRol() {
-        return rol;
+    public String getApellido_materno() {
+        return apellido_materno;
     }
 
-    public void setRol(String rol) {
-        this.rol = rol;
+    public void setApellido_materno(String apellido_materno) {
+        this.apellido_materno = apellido_materno;
     }
 
     public String getTelefono() {
@@ -64,14 +60,31 @@ public class Usuarios {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    } 
-
-    public String getUsername() {
-        return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getNombre_usuario() {
+        return nombre_usuario;
     }
+
+    public void setNombre_usuario(String nombre_usuario) {
+        this.nombre_usuario = nombre_usuario;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getNombre_perfil() {
+        return nombre_perfil;
+    }
+
+    public void setNombre_perfil(String nombre_perfil) {
+        this.nombre_perfil = nombre_perfil;
+    }
+    
     
 }
