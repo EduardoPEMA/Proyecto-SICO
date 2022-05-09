@@ -6,7 +6,7 @@
 package databases;
 
 import cliente.servidor.Conexion;
-import cliente.servidor.Usuarios;
+import classes.Usuarios;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,7 +31,7 @@ public class DBUsuarios {
         stmt.setString(1, us.getNombre());
         stmt.setString(2, us.getUsername());
         stmt.setString(3, us.getPassword());
-        stmt.setString(4, us.getTelefono());
+        stmt.setString(4, us.getRol());
         stmt.setString(5, null);
         stmt.executeUpdate();
     }
@@ -46,8 +46,9 @@ public class DBUsuarios {
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, us.getNombre());
         stmt.setString(2, us.getUsername());
-        stmt.setString(3, us.getPassword());
-        stmt.setString(4, String.valueOf(us.getId()));
+        stmt.setString(3, us.getRol());
+        stmt.setString(4, us.getPassword());
+        stmt.setString(5, String.valueOf(us.getId()));
 
         stmt.executeUpdate();
     }
