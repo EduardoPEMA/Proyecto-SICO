@@ -50,7 +50,7 @@ public class DBProducto {
         stmt.executeUpdate();
     }
 
-    public void eliminarCliente(Producto pro) throws SQLException {
+    public void eliminarProducto(Producto pro) throws SQLException {
         String sql = "DELETE FROM productos\n"
                 + " WHERE id = ?\n";
 
@@ -59,7 +59,7 @@ public class DBProducto {
         stmt.executeUpdate();
     }
 
-    public String buscarCliente(Producto pro) throws SQLException {
+    public String buscarProducto(Producto pro) throws SQLException {
         String result = "";
         String sql = "SELECT * FROM productos WHERE id = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);

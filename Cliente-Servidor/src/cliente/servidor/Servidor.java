@@ -6,7 +6,10 @@
 package cliente.servidor;
 
 import classes.Clientes;
+import classes.Producto;
 import classes.Usuarios;
+import databases.DBCliente;
+import databases.DBProducto;
 import databases.DBUsuarios;
 import java.io.*;
 import java.net.*;
@@ -91,13 +94,14 @@ public class Servidor extends javax.swing.JFrame {
                         = new DatagramPacket(datos, datos.length);
                 socket.receive(recibirPaquete);//espera al paquete
                 if (recibirPaquete.getLength() != 0) {
-                    JOptionPane.showMessageDialog(this, "Solicitud de operación");
+                    //JOptionPane.showMessageDialog(this, "Solicitud de operación");
                     String cad = (new String(recibirPaquete.getData(),
                             0, recibirPaquete.getLength()));
                     String[] variables;
                     variables = cad.split(" ");
                     Usuarios us = new Usuarios();
                     Clientes cli = new Clientes();
+                    Producto pro = new Producto();
                     System.out.println("Enviar-cliente " + recibirPaquete);
                     conn = con.Conexion();
                     mensaje = variables[0];
@@ -135,13 +139,15 @@ public class Servidor extends javax.swing.JFrame {
                                     us.setUsername(variables[3]);
                                     us.setPassword(variables[4]);
                                     us.setRol(variables[5]);
+                                    us.setId(Integer.parseInt(variables[6]));
                                     DBUsuarios db = new DBUsuarios(conn);
                                     db.editarUsuario(us);
                                     break;
                                 }
                                 case "eliminar": {
                                     mensajeAlerta = "eliminar";
-                                    us.setUsername(variables[2]);
+                                    us.setId(Integer.parseInt(variables[2]));
+                                    
                                     DBUsuarios db = new DBUsuarios(conn);
                                     db.eliminarUsuario(us);
                                     break;
@@ -155,7 +161,7 @@ public class Servidor extends javax.swing.JFrame {
 
                                     if (mensaje.length() == 0) {
                                         mensaje = "No hay resultados";
-                                        mensajeAlerta = "";
+                                        mensajeAlerta = "No hay resultados";
                                         mostrarMensaje("Sin resultados");
                                     }
                                     break;
@@ -168,21 +174,22 @@ public class Servidor extends javax.swing.JFrame {
                                 case "insertar": {
                                     mensajeAlerta = "insertado";
 
-                                    us.setNombre(variables[2]);
-                                    us.setUsername(variables[3]);
-                                    us.setPassword(variables[4]);
-                                    us.setRol(variables[5]);
+                                    cli.setNombre(variables[2]);
+                                    cli.setRfc(variables[3]);
+                                    cli.setTelefono(variables[4]);
+                                    cli.setEmail(variables[5]);
 
-                                    DBUsuarios db = new DBUsuarios(conn);
-                                    db.guardarUsuario(us);
+                                    DBCliente db = new DBCliente(conn);
+                                    db.guardarCliente(cli);
                                     break;
                                 }
                                 case "buscar": {
                                     result = "";
                                     mensajeAlerta = "encontrado";
-                                    us.setNombre(variables[2]);
-                                    DBUsuarios db = new DBUsuarios(conn);
-                                    mensaje = db.buscarUsuario(us);
+                                    cli.setNombre(variables[2]);
+                                    cli.setId(Integer.parseInt(variables[3]));
+                                    DBCliente db = new DBCliente(conn);
+                                    mensaje = db.buscarCliente(cli);
 
                                     if (mensaje.length() == 0) {
                                         mensajeAlerta = "";
@@ -192,32 +199,65 @@ public class Servidor extends javax.swing.JFrame {
                                 }
                                 case "editar": {
                                     mensajeAlerta = "editado";
-                                    us.setNombre(variables[2]);
-                                    us.setUsername(variables[3]);
-                                    us.setPassword(variables[4]);
-                                    us.setRol(variables[5]);
-                                    DBUsuarios db = new DBUsuarios(conn);
-                                    db.editarUsuario(us);
+                                    cli.setNombre(variables[2]);
+                                    cli.setRfc(variables[3]);
+                                    cli.setTelefono(variables[4]);
+                                    cli.setEmail(variables[5]);
+                                    cli.setId(Integer.parseInt(variables[6]));
+                                    DBCliente db = new DBCliente(conn);
+                                    db.editarCliente(cli);
                                     break;
                                 }
                                 case "eliminar": {
                                     mensajeAlerta = "eliminar";
-                                    us.setUsername(variables[2]);
-                                    DBUsuarios db = new DBUsuarios(conn);
-                                    db.eliminarUsuario(us);
+                                    cli.setId(Integer.parseInt(variables[2]));
+                                    DBCliente db = new DBCliente(conn);
+                                    db.eliminarCliente(cli);
                                     break;
                                 }
-                                case "login": {
-                                    mensajeAlerta = "login";
-                                    us.setUsername(variables[2]);
-                                    us.setPassword(variables[3]);
-                                    DBUsuarios db = new DBUsuarios(conn);
-                                    mensaje = db.login(us);
+                            }
+                            break;
+                        }
+                        case "producto": {
+                            switch(variables[1]){
+                                case "insertar": {
+                                    mensajeAlerta = "insertado";
 
-                                    if (mensaje.equals("")) {
+                                    pro.setDescripcion(variables[2]);
+                                    pro.setStock(variables[3]);
+                                    pro.setPrecio(variables[4]);
+
+                                    DBProducto db = new DBProducto(conn);
+                                    db.guardarProducto(pro);
+                                    break;
+                                }
+                                case "buscar": {
+                                    result = "";
+                                    mensajeAlerta = "encontrado";
+                                    pro.setId(Integer.parseInt(variables[2]));
+                                    DBProducto db = new DBProducto(conn);
+                                    mensaje = db.buscarProducto(pro);
+
+                                    if (mensaje.length() == 0) {
                                         mensajeAlerta = "";
                                         mostrarMensaje("Sin resultados");
                                     }
+                                    break;
+                                }
+                                case "editar": {
+                                    mensajeAlerta = "editado";
+                                    pro.setDescripcion(variables[2]);
+                                    pro.setStock(variables[3]);
+                                    pro.setPrecio(variables[4]);
+                                    DBProducto db = new DBProducto(conn);
+                                    db.editarProducto(pro);
+                                    break;
+                                }
+                                case "eliminar": {
+                                    mensajeAlerta = "eliminar";
+                                    pro.setId(Integer.parseInt(variables[2]));
+                                    DBProducto db = new DBProducto(conn);
+                                    db.eliminarProducto(pro);
                                     break;
                                 }
                             }
