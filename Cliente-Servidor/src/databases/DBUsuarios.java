@@ -3,75 +3,75 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cliente.servidor;
+package databases;
+
+import cliente.servidor.Conexion;
+import cliente.servidor.Usuarios;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
- * @author Eduardo
  */
-public class Usuarios {
-    private int usuario_id;
-    private int id;
-    private String nombre;
-    private String username;
-    private String telefono;
-    private String password;
-    private String rol;
+public class DBUsuarios {
 
-    public int getUsuario_id() {
-        return usuario_id;
+    Conexion con;
+    Connection conn;
+    ResultSet rs;
+
+    public DBUsuarios(Connection conn) {
+        this.conn = conn;
     }
 
-    public void setUsuario_id(int usuario_id) {
-        this.usuario_id = usuario_id;
+    public void guardarUsuario(Usuarios us) throws SQLException {
+        String sql = "INSERT INTO usuarios VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, us.getNombre());
+        stmt.setString(2, us.getUsername());
+        stmt.setString(3, us.getPassword());
+        stmt.setString(4, us.getTelefono());
+        stmt.setString(5, null);
+        stmt.executeUpdate();
     }
 
-    public int getId() {
-        return id;
+    public void editarUsuario(Usuarios us) throws SQLException {
+        String sql = "UPDATE usuarios\n"
+                + "SET nombre = ?,\n"
+                + "username = ?,\n"
+                + "password = ?,\n"
+                + "rol = ?\n"
+                + "WHERE id = ?\n";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, us.getNombre());
+        stmt.setString(2, us.getUsername());
+        stmt.setString(3, us.getPassword());
+        stmt.setString(4, String.valueOf(us.getId()));
+
+        stmt.executeUpdate();
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void eliminarUsuario(Usuarios us) throws SQLException {
+        String sql = "DELETE FROM usuarios\n"
+                + " WHERE id = ?\n";
+
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, String.valueOf(us.getId()));
+        stmt.executeUpdate();
     }
 
-    public String getNombre() {
-        return nombre;
+    public String buscarUsuario(Usuarios us) throws SQLException {
+        String result = "";
+        String sql = "SELECT * FROM usuarios WHERE id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, String.valueOf(us.getId()));
+        rs = stmt.executeQuery();
+        while (rs.next()) {
+            result += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("username")
+                    + " " + rs.getString("rol") + " " + rs.getString("password") + " \n";
+        }
+        return result;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRol() {
-        return rol;
-    }
-
-    public void setRol(String rol) {
-        this.rol = rol;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    } 
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
 }
