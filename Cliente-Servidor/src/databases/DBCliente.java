@@ -17,61 +17,89 @@ import java.sql.SQLException;
  */
 public class DBCliente {
 
-    Conexion con;
+     Conexion con;
     Connection conn;
     ResultSet rs;
+    PreparedStatement ps = null;
 
     public DBCliente(Connection conn) {
         this.conn = conn;
     }
 
     public void guardarCliente(Clientes cl) throws SQLException {
-        String sql = "INSERT INTO clientes VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, cl.getNombre());
-        stmt.setString(2, cl.getRfc());
-        stmt.setString(3, cl.getTelefono());
-        stmt.setString(4, cl.getEmail());
-        stmt.setString(5, null);
-        stmt.executeUpdate();
+        try {
+            String sql = "INSERT INTO clientes  (id, nombre, rfc, telefono, email) VALUES (?, ?, ?, ?, ?)";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, null);
+            ps.setString(2, cl.getNombre());
+            ps.setString(3, cl.getRfc());
+            ps.setString(4, cl.getTelefono());
+            ps.setString(5, cl.getEmail());
+            ps.executeUpdate();
+        } catch(SQLException exp){
+            exp.printStackTrace();
+        }
+        finally{
+            try{
+                ps.close();
+            }catch(SQLException exp){
+                exp.printStackTrace();
+            }
+        }
+        
     }
 
     public void editarCliente(Clientes cl) throws SQLException {
-        String sql = "UPDATE clientes\n"
+        try {
+            String sql = "UPDATE clientes\n"
                 + "SET nombre = ?,\n"
-                + "RFC = ?,\n"
+                + "rfc = ?,\n"
                 + "telefono = ?,\n"
                 + "email = ?\n"
                 + "WHERE id = ?\n";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, cl.getNombre());
-        stmt.setString(2, cl.getRfc());
-        stmt.setString(3, cl.getTelefono());
-        stmt.setString(4, cl.getEmail());
-        stmt.setString(5, String.valueOf(cl.getId()));
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, cl.getNombre());
+            ps.setString(2, cl.getRfc());
+            ps.setString(3, cl.getTelefono());
+            ps.setString(4, cl.getEmail());
+            ps.setString(5, String.valueOf(cl.getId()));
 
-        stmt.executeUpdate();
-    }
-
-    public void eliminarCliente(Clientes cl) throws SQLException {
-        String sql = "DELETE FROM clientes\n"
-                + " WHERE id = ?\n";
-
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, String.valueOf(cl.getId()));
-        stmt.executeUpdate();
+            ps.executeUpdate();
+        }catch(SQLException exp){
+            exp.printStackTrace();
+        }
+        finally{
+            try{
+                ps.close();
+            }catch(SQLException exp){
+                exp.printStackTrace();
+            }
+        }
+        
     }
 
     public String buscarCliente(Clientes cl) throws SQLException {
         String result = "";
-        String sql = "SELECT * FROM clientes WHERE id = ?";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, String.valueOf(cl.getId()));
-        rs = stmt.executeQuery();
-        while (rs.next()) {
-            result += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("rfc")
-                    + " " + rs.getString("telefono") + " " + rs.getString("email") + " \n";
+        try {
+            String sql = "SELECT * FROM clientes WHERE nombre = ? LIMIT 1";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, cl.getNombre());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                result += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("rfc")
+                        + " " + rs.getString("telefono") + " " + rs.getString("email") + " \n";
+            }
+        }catch(SQLException exp){
+            exp.printStackTrace();
         }
+        finally{
+            try{
+                ps.close();
+            }catch(SQLException exp){
+                exp.printStackTrace();
+            }
+        }
+        
         return result;
     }
 

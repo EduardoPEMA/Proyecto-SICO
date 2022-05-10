@@ -26,7 +26,6 @@ public class ClientesView extends javax.swing.JFrame {
      * Creates new form UsuariosView
      */
     private String nombre = "";
-    private String buscarCliente = "";
     private String RFC = "";
     private String telefono = "";
     private String email = "";
@@ -34,6 +33,7 @@ public class ClientesView extends javax.swing.JFrame {
     private boolean nombreIsValid = false;
     private boolean RFCIsValid = false;
     private boolean telefonoIsValid = false;
+    private boolean emailIsValid = false;
     private Utils utils = new Utils();
     public Connection connection;
     private DatagramSocket socket;
@@ -49,6 +49,7 @@ public class ClientesView extends javax.swing.JFrame {
             conexion = new Conexion();
             socket = new DatagramSocket();
             idInput.setEnabled(false);
+            
         } catch (SocketException ex) {
             Logger.getLogger(ClientesView.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -81,7 +82,6 @@ public class ClientesView extends javax.swing.JFrame {
         nuevoButton = new javax.swing.JButton();
         guardarButton = new javax.swing.JButton();
         editarButton = new javax.swing.JButton();
-        eliminarButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         emailInput = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
@@ -166,7 +166,7 @@ public class ClientesView extends javax.swing.JFrame {
                 cancelarButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 400, 110, 40));
+        getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 400, 110, 40));
 
         nuevoButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
         nuevoButton.setText("Nuevo");
@@ -195,15 +195,6 @@ public class ClientesView extends javax.swing.JFrame {
         });
         getContentPane().add(editarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 400, 110, 40));
 
-        eliminarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        eliminarButton.setText("Eliminar");
-        eliminarButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                eliminarButtonActionPerformed(evt);
-            }
-        });
-        getContentPane().add(eliminarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 400, 110, 40));
-
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/whiteLogo.png"))); // NOI18N
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 160, 170, 160));
 
@@ -227,34 +218,46 @@ public class ClientesView extends javax.swing.JFrame {
 
     private void setEstado(Boolean state) {
         editarButton.setEnabled(state);
-        eliminarButton.setEnabled(state);
         guardarButton.setEnabled(state);
         nombreInput.setEnabled(state);
         rfcInput.setEnabled(state);
         telefonoInput.setEnabled(state);
         emailInput.setEnabled(state);
+        limpiarTexto();
     }
 
     private boolean getEstados() {
-        return nombreIsValid && RFCIsValid && telefonoIsValid;
+        return nombreIsValid && RFCIsValid && telefonoIsValid && emailIsValid;
     }
 
     private void permitirAccion() {
+        if (!idInput.getText().equals("")) {
+            guardarButton.setEnabled(false);
+            return;
+        }
         boolean permitir = getEstados();
         guardarButton.setEnabled(permitir);
     }
-    private void buscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarButtonActionPerformed
-        // TODO add your handling code here:
+    
+        public void limpiarTexto() {
+        nombreInput.setText("");
+        rfcInput.setText("");
+        telefonoInput.setText("");
+        emailInput.setText("");
+        buscarInput.setText("");
+        idInput.setText("");
+    }
+
+    public void buscar(String busqueda) {
         try {
 //obtener mensaje del campo de texto y convertirlo en arreglo byte
-            buscarCliente = buscarInput.getText();
-            String mensaje = "cliente" + " " + "buscar" + " " + buscarCliente;
+            String mensaje = "cliente" + " " + "buscar" + " " + busqueda;
             JOptionPane.showMessageDialog(null, "Buscar cliente...", "Advertencia",
                     JOptionPane.WARNING_MESSAGE);
             byte datos[] = mensaje.getBytes();
             DatagramPacket enviarPaquete = new DatagramPacket(datos,
                     datos.length, InetAddress.getLocalHost(), 5000);
-            socket.send(enviarPaquete);//enviar paquete
+            socket.send(enviarPaquete); //enviar paquete
         } catch (IOException exceptionES) {
             exceptionES.printStackTrace();
         }
@@ -265,15 +268,56 @@ public class ClientesView extends javax.swing.JFrame {
             excepcionSocket.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private void esperarPaquetes() {
+        try {
+//establecer el paquete
+            byte datos[] = new byte[100];
+            DatagramPacket recibirPaquete = new DatagramPacket(
+                    datos, datos.length);
+            socket.receive(recibirPaquete);//esperar un paquete
+            if (recibirPaquete.getLength() == 0) {
+                limpiarTexto();
+                this.dispose();
+            }
+            String cad = (new String(recibirPaquete.getData(),
+                    0, recibirPaquete.getLength()));
+            if (cad.equals("No hay resultados")) {
+                JOptionPane.showMessageDialog(null, "No hay resultados.");
+                limpiarTexto();
+                return;
+            }
+            setEstado(true);
+            String[] variables;
+            variables = cad.split(" ");
+            idInput.setText(variables[0]);
+            nombreInput.setText(variables[1]);
+            rfcInput.setText(variables[2]);
+            telefonoInput.setText(variables[3]);
+            emailInput.setText(variables[4]);
+
+        } catch (IOException excepcion) {
+            excepcion.printStackTrace();
+        }
+    }//fin
+
+    private void buscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarButtonActionPerformed
+        // TODO add your handling code here:
+        buscar(buscarInput.getText());
     }//GEN-LAST:event_buscarButtonActionPerformed
 
     private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
-        // TODO add your handling code here:
+        limpiarTexto();
+        permitirAccion();
+        setEstado(false);
     }//GEN-LAST:event_cancelarButtonActionPerformed
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
-        // TODO add your handling code here:
         setEstado(true);
+        if (idInput.getText().equals("")) {
+            editarButton.setEnabled(false);
+        }
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
     private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
@@ -295,6 +339,8 @@ public class ClientesView extends javax.swing.JFrame {
         }
         try {
             socket = new DatagramSocket();
+            buscar(nombreInput.getText());
+            guardarButton.setEnabled(false);
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
             System.exit(1);
@@ -303,12 +349,19 @@ public class ClientesView extends javax.swing.JFrame {
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
         // TODO add your handling code here:
+        // TODO add your handling code here:
+        if (idInput.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "No se encontró el usuario a editar",
+                    "Error :(", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         try {
             nombre = nombreInput.getText();
             RFC = rfcInput.getText();
             telefono = telefonoInput.getText();
             email = emailInput.getText();
-            String mensaje = "cliente" + " " + "editar" + " " + nombre + " " + RFC + " " + telefono + " " + email;
+            id = idInput.getText();
+            String mensaje = "cliente" + " " + "editar" + " " + nombre + " " + RFC + " " + telefono + " " + email + " " + id;
             byte datos[] = mensaje.getBytes();
             JOptionPane.showMessageDialog(null, "Editar cliente...", "Advertencia",
                     JOptionPane.WARNING_MESSAGE);
@@ -328,36 +381,6 @@ public class ClientesView extends javax.swing.JFrame {
     }//GEN-LAST:event_editarButtonActionPerformed
 
 
-    private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
-        // TODO add your handling code here:
-        if (idInput.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "No se encontró el cliente a eliminar",
-                    "Error :(", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        try {
-            id = idInput.getText();
-            String mensaje = "cliente" + " " + "eliminar" + " " + id;
-            byte datos[] = mensaje.getBytes();
-//crear enviarPaquete
-            JOptionPane.showMessageDialog(null, "Eliminar cliente...", "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
-            DatagramPacket enviarPaquete = new DatagramPacket(datos,
-                    datos.length, InetAddress.getLocalHost(), 5000);
-            socket.send(enviarPaquete);//enviar paquete
-            limpiarTexto();
-        } catch (IOException exceptionES) {
-            exceptionES.printStackTrace();
-        }
-        try {
-            socket = new DatagramSocket();
-        } //atrapar los problemas que puedan ocurrir al crear objeto DatagramSocket
-        catch (SocketException excepcionSocket) {
-            excepcionSocket.printStackTrace();
-            System.exit(1);
-        }
-    }//GEN-LAST:event_eliminarButtonActionPerformed
-
     private void nombreInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nombreInputKeyReleased
         // TODO add your handling code here:
         String aux = nombreInput.getText();
@@ -369,9 +392,7 @@ public class ClientesView extends javax.swing.JFrame {
     private void rfcInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_rfcInputKeyReleased
         // TODO add your handling code here:
         String aux = rfcInput.getText();
-        RFCIsValid = !aux.equals("")
-                && (aux != null)
-                && (aux.matches("^([A-ZÑ\\x26]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1]))((-)?([A-Z\\d]{3}))?$"));
+        RFCIsValid = !aux.equals("");
         permitirAccion();
     }//GEN-LAST:event_rfcInputKeyReleased
 
@@ -385,47 +406,14 @@ public class ClientesView extends javax.swing.JFrame {
 
     private void emailInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_emailInputKeyReleased
         // TODO add your handling code here:
+        String aux = emailInput.getText();
+        emailIsValid =  !aux.equals("");
+        permitirAccion();
     }//GEN-LAST:event_emailInputKeyReleased
 
     private void idInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_idInputKeyReleased
         // TODO add your handling code here:
     }//GEN-LAST:event_idInputKeyReleased
-
-    public void limpiarTexto() {
-        nombreInput.setText("");
-        rfcInput.setText("");
-        telefonoInput.setText("");
-        emailInput.setText("");
-        buscarInput.setText("");
-        idInput.setText("");
-    }
-
-    private void esperarPaquetes() {
-        try {
-//establecer el paquete
-            byte datos[] = new byte[100];
-            DatagramPacket recibirPaquete = new DatagramPacket(
-                    datos, datos.length);
-            socket.receive(recibirPaquete);//esperar un paquete
-            if (recibirPaquete.getLength() == 0) {
-                limpiarTexto();
-                this.dispose();
-            }
-            String cad = (new String(recibirPaquete.getData(),
-                    0, recibirPaquete.getLength()));
-            String[] variables;
-            variables = cad.split(" ");
-            idInput.setText(variables[0]);
-            nombreInput.setText(variables[1]);
-            rfcInput.setText(variables[2]);
-            telefonoInput.setText(variables[3]);
-            emailInput.setText(variables[4]);
-
-        } catch (IOException excepcion) {
-            excepcion.printStackTrace();
-        }
-
-    }//fin
 
     /**
      * @param args the command line arguments
@@ -468,7 +456,6 @@ public class ClientesView extends javax.swing.JFrame {
     private javax.swing.JTextField buscarInput;
     private javax.swing.JButton cancelarButton;
     private javax.swing.JButton editarButton;
-    private javax.swing.JButton eliminarButton;
     private javax.swing.JTextField emailInput;
     private javax.swing.JButton guardarButton;
     private javax.swing.JTextField idInput;

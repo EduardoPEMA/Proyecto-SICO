@@ -127,7 +127,7 @@ public class Servidor extends javax.swing.JFrame {
                                     DBUsuarios db = new DBUsuarios(conn);
                                     mensaje = db.buscarUsuario(us);
                                     if (mensaje.length() == 0) {
-                                        mensaje= "No hay resultados";
+                                        mensaje = "No hay resultados";
                                         mensajeAlerta = "No hay resultados";
                                         mostrarMensaje("Sin resultados");
                                     }
@@ -177,12 +177,10 @@ public class Servidor extends javax.swing.JFrame {
                             switch (variables[1]) {
                                 case "insertar": {
                                     mensajeAlerta = "insertado";
-
                                     cli.setNombre(variables[2]);
                                     cli.setRfc(variables[3]);
                                     cli.setTelefono(variables[4]);
                                     cli.setEmail(variables[5]);
-
                                     DBCliente db = new DBCliente(conn);
                                     db.guardarCliente(cli);
                                     break;
@@ -191,12 +189,11 @@ public class Servidor extends javax.swing.JFrame {
                                     result = "";
                                     mensajeAlerta = "encontrado";
                                     cli.setNombre(variables[2]);
-                                    cli.setId(Integer.parseInt(variables[3]));
                                     DBCliente db = new DBCliente(conn);
                                     mensaje = db.buscarCliente(cli);
-
                                     if (mensaje.length() == 0) {
-                                        mensajeAlerta = "";
+                                        mensaje = "No hay resultados";
+                                        mensajeAlerta = "No hay resultados";
                                         mostrarMensaje("Sin resultados");
                                     }
                                     break;
@@ -210,13 +207,6 @@ public class Servidor extends javax.swing.JFrame {
                                     cli.setId(Integer.parseInt(variables[6]));
                                     DBCliente db = new DBCliente(conn);
                                     db.editarCliente(cli);
-                                    break;
-                                }
-                                case "eliminar": {
-                                    mensajeAlerta = "eliminar";
-                                    cli.setId(Integer.parseInt(variables[2]));
-                                    DBCliente db = new DBCliente(conn);
-                                    db.eliminarCliente(cli);
                                     break;
                                 }
                             }
