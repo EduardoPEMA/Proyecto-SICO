@@ -5,6 +5,8 @@
  */
 package cliente.servidor;
 
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author isaac
@@ -14,9 +16,13 @@ public class VentasView extends javax.swing.JFrame {
     /**
      * Creates new form UsuariosView
      */
+    DefaultTableModel tablaVentas;
     public VentasView() {
         initComponents();
         this.setLocationRelativeTo(null);
+        tablaVentas = (DefaultTableModel)ticketTable.getModel();
+        ticketTable.setAutoCreateRowSorter(true);
+        ticketTable.getRowSorter().toggleSortOrder(0);
     }
 
     /**
@@ -112,7 +118,7 @@ public class VentasView extends javax.swing.JFrame {
                 finalizarrButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(finalizarrButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 460, 110, 40));
+        getContentPane().add(finalizarrButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 460, 140, 40));
 
         jLabel11.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));

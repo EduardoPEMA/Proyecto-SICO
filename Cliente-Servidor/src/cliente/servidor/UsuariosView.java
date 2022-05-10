@@ -284,7 +284,7 @@ public class UsuariosView extends javax.swing.JFrame {
 
     private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
         // TODO add your handling code here:
-
+        
         try {
             nombre = nombreInput.getText();
             username = usernameInput.getText();
@@ -429,6 +429,7 @@ public class UsuariosView extends javax.swing.JFrame {
                 return;
             }
             setEstado(true);
+            guardarButton.setEnabled(false);
             String[] variables;
             variables = cad.split(" ");
             idInput.setText(variables[0]);

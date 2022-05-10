@@ -5,6 +5,15 @@
  */
 package cliente.servidor;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import utils.Utils;
 
 /**
@@ -16,16 +25,102 @@ public class ProductosView extends javax.swing.JFrame {
     /**
      * Creates new form UsuariosView
      */
+    private String descripcion = "";
+    private String stock = "";
+    private String precio = "";
+    private String id = "";
     private boolean descripcionIsValid = true;
     private boolean stockIsValid = false;
     private boolean precioIsValid = false;
     private Utils utils = new Utils();
 
+    public Connection connection;
+    private DatagramSocket socket;
+
+    Conexion conexion;
+
     public ProductosView() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-        permitirAccion();
-        
+        try {
+            initComponents();
+            this.setLocationRelativeTo(null);
+            setEstado(false);
+            permitirAccion();
+            conexion = new Conexion();
+            socket = new DatagramSocket();
+            idInput.setEnabled(false);
+
+        } catch (SocketException ex) {
+            Logger.getLogger(ClientesView.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+    }
+
+    private void setEstado(Boolean state) {
+        editarButton.setEnabled(state);
+        guardarButton.setEnabled(state);
+        stockInput.setEnabled(state);
+        descripcionInput.setEnabled(state);
+        precioInput.setEnabled(state);
+        limpiarTexto();
+    }
+
+    public void buscar(String busqueda) {
+        try {
+//obtener mensaje del campo de texto y convertirlo en arreglo byte
+            String mensaje = "producto" + " " + "buscar" + " " + busqueda;
+            byte datos[] = mensaje.getBytes();
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete); //enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            esperarPaquetes();
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void esperarPaquetes() {
+        try {
+//establecer el paquete
+            byte datos[] = new byte[100];
+            DatagramPacket recibirPaquete = new DatagramPacket(
+                    datos, datos.length);
+            socket.receive(recibirPaquete);//esperar un paquete
+            if (recibirPaquete.getLength() == 0) {
+                limpiarTexto();
+                this.dispose();
+            }
+            String cad = (new String(recibirPaquete.getData(),
+                    0, recibirPaquete.getLength()));
+            if (cad.equals("No hay resultados")) {
+                JOptionPane.showMessageDialog(null, "No hay resultados.");
+                limpiarTexto();
+                return;
+            }
+            setEstado(true);
+            String[] variables;
+            variables = cad.split(" ");
+            idInput.setText(variables[0]);
+            descripcionInput.setText(variables[1]);
+            stockInput.setText(variables[2]);
+            precioInput.setText(variables[3]);
+
+        } catch (IOException excepcion) {
+            excepcion.printStackTrace();
+        }
+    }//fin
+
+    public void limpiarTexto() {
+        stockInput.setText("");
+        descripcionInput.setText("");
+        precioInput.setText("");
+        buscarInput.setText("");
+        idInput.setText("");
     }
 
     private boolean getEstados() {
@@ -189,26 +284,108 @@ public class ProductosView extends javax.swing.JFrame {
 
     private void buscarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarButtonActionPerformed
         // TODO add your handling code here:
+        buscar(buscarInput.getText());
     }//GEN-LAST:event_buscarButtonActionPerformed
 
     private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
         // TODO add your handling code here:
+        limpiarTexto();
+        permitirAccion();
+        setEstado(false);
     }//GEN-LAST:event_cancelarButtonActionPerformed
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
         // TODO add your handling code here:
+        setEstado(true);
+        if (idInput.getText().equals("")) {
+            editarButton.setEnabled(false);
+        }
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
     private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
         // TODO add your handling code here:
+        try {
+            descripcion = descripcionInput.getText();
+            stock = stockInput.getText();
+            precio = precioInput.getText();
+            String mensaje = "producto" + " " + "insertar" + " " + descripcion + " " + stock + " " + precio;
+            byte datos[] = mensaje.getBytes();
+            JOptionPane.showMessageDialog(null, "Agregando producto...", "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete);//enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            socket = new DatagramSocket();
+            buscar(descripcionInput.getText());
+            guardarButton.setEnabled(false);
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }//GEN-LAST:event_guardarButtonActionPerformed
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
         // TODO add your handling code here:
+        if (idInput.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "No se encontró el usuario a editar",
+                    "Error :(", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            descripcion = descripcionInput.getText();
+            stock = stockInput.getText();
+            precio = precioInput.getText();
+            id = idInput.getText();
+            String mensaje = "producto" + " " + "editar" + " " + descripcion + " " + stock + " " + precio + " " + id;
+            byte datos[] = mensaje.getBytes();
+            JOptionPane.showMessageDialog(null, "Editar producto...", "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+//crear enviarPaquete
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete);//enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }//GEN-LAST:event_editarButtonActionPerformed
 
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
         // TODO add your handling code here:
+        if (idInput.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "No se encontró el usuario a editar",
+                    "Error :(", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            id = idInput.getText();
+            String mensaje = "producto" + " " + "eliminar" + " " + id;
+            byte datos[] = mensaje.getBytes();
+            JOptionPane.showMessageDialog(null, "Eliminar producto...", "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+//crear enviarPaquete
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete);//enviar paquete
+            limpiarTexto();
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
     }//GEN-LAST:event_eliminarButtonActionPerformed
 
     private void descripcionInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_descripcionInputKeyReleased

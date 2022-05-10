@@ -220,7 +220,6 @@ public class Servidor extends javax.swing.JFrame {
                                     pro.setDescripcion(variables[2]);
                                     pro.setStock(variables[3]);
                                     pro.setPrecio(variables[4]);
-
                                     DBProducto db = new DBProducto(conn);
                                     db.guardarProducto(pro);
                                     break;
@@ -228,12 +227,13 @@ public class Servidor extends javax.swing.JFrame {
                                 case "buscar": {
                                     result = "";
                                     mensajeAlerta = "encontrado";
-                                    pro.setId(Integer.parseInt(variables[2]));
+                                    pro.setDescripcion(variables[2]);
                                     DBProducto db = new DBProducto(conn);
                                     mensaje = db.buscarProducto(pro);
 
                                     if (mensaje.length() == 0) {
-                                        mensajeAlerta = "";
+                                        mensaje = "No hay resultados";
+                                        mensajeAlerta = "No hay resultados";
                                         mostrarMensaje("Sin resultados");
                                     }
                                     break;
@@ -243,6 +243,7 @@ public class Servidor extends javax.swing.JFrame {
                                     pro.setDescripcion(variables[2]);
                                     pro.setStock(variables[3]);
                                     pro.setPrecio(variables[4]);
+                                    pro.setId(Integer.parseInt(variables[5]));
                                     DBProducto db = new DBProducto(conn);
                                     db.editarProducto(pro);
                                     break;

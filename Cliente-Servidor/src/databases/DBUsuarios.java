@@ -57,7 +57,6 @@ public class DBUsuarios {
                 + "rol = ?,\n"
                 + "password = ?\n"
                 + "WHERE id = ?\n";
-            System.out.println(us.getRol());
             ps = conn.prepareStatement(sql);
             ps.setString(1, us.getNombre());
             ps.setString(2, us.getUsername());
