@@ -5,25 +5,115 @@
  */
 package cliente.servidor;
 
+import databases.DBVenta;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author isaac
+ * @author Eduardo
  */
 public class VentasView extends javax.swing.JFrame {
 
     /**
-     * Creates new form UsuariosView
+     * Creates new form Ventas
      */
     DefaultTableModel tablaVentas;
+    public Connection connection;
+    private DatagramSocket socket;
+
+    Conexion conexion;
+
+    String aux;
+
     public VentasView() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-        tablaVentas = (DefaultTableModel)ticketTable.getModel();
-        ticketTable.setAutoCreateRowSorter(true);
-        ticketTable.getRowSorter().toggleSortOrder(0);
+        try {
+            initComponents();
+            this.setLocationRelativeTo(null);
+
+            tablaVentas = (DefaultTableModel) ticketTable.getModel();
+            ticketTable.setAutoCreateRowSorter(true);
+            ticketTable.getRowSorter().toggleSortOrder(0);
+            conexion = new Conexion();
+            socket = new DatagramSocket();
+            getCatalogoProductos();
+
+        } catch (SocketException ex) {
+            Logger.getLogger(VentasView.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
+
+    public void limpiarTexto() {
+        precioInput.setText("");
+    }
+
+    private void getCatalogoProductos() {
+        try {
+//obtener mensaje del campo de texto y convertirlo en arreglo byte
+            String mensaje = "producto" + " " + "listar" + " ";
+            byte datos[] = mensaje.getBytes();
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete); //enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            esperarPaquetes(true, productoInput);
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void setValuesCB(String[] variables, JComboBox<String> comboBox) {
+        List<String> list = new ArrayList<>(Arrays.asList(variables));
+        for (String s : list) {
+            comboBox.addItem(s);
+        }
+    }
+
+    private void esperarPaquetes(Boolean isCatalogue, JComboBox<String> comboBox) {
+        try {
+//establecer el paquete
+            byte datos[] = new byte[100];
+            DatagramPacket recibirPaquete = new DatagramPacket(
+                    datos, datos.length);
+            socket.receive(recibirPaquete);//esperar un paquete
+            if (recibirPaquete.getLength() == 0) {
+                limpiarTexto();
+                this.dispose();
+            }
+            String cad = (new String(recibirPaquete.getData(),
+                    0, recibirPaquete.getLength()));
+            if (cad.equals("No hay resultados")) {
+                JOptionPane.showMessageDialog(null, "No hay resultados.");
+                limpiarTexto();
+                return;
+            }
+            String[] variables;
+            variables = cad.split(" ");
+
+            if(isCatalogue) {
+                setValuesCB(variables, comboBox);
+            }
+        } catch (IOException excepcion) {
+            excepcion.printStackTrace();
+        }
+    }//fin
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -34,178 +124,52 @@ public class VentasView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel6 = new javax.swing.JLabel();
-        folioInput = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        clienteIdInput = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        clienteInput = new javax.swing.JComboBox<>();
-        nuevoButton = new javax.swing.JButton();
-        finalizarrButton = new javax.swing.JButton();
-        jLabel11 = new javax.swing.JLabel();
-        precioInput = new javax.swing.JTextField();
-        jLabel12 = new javax.swing.JLabel();
-        fechaInput = new javax.swing.JTextField();
-        jLabel13 = new javax.swing.JLabel();
-        productoIdInput = new javax.swing.JTextField();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        productoInput = new javax.swing.JComboBox<>();
-        jLabel16 = new javax.swing.JLabel();
-        cantidadInput = new javax.swing.JTextField();
-        agregarButton = new javax.swing.JButton();
-        quitarButton = new javax.swing.JButton();
-        jLabel17 = new javax.swing.JLabel();
-        subtotalInput = new javax.swing.JTextField();
-        jLabel18 = new javax.swing.JLabel();
         ivaInput = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
         totalInput = new javax.swing.JTextField();
         jLabel19 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         ticketTable = new javax.swing.JTable();
+        precioInput = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        clienteIdInput = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        clienteInput = new javax.swing.JComboBox<>();
+        jLabel8 = new javax.swing.JLabel();
+        folioInput = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        productoInput = new javax.swing.JComboBox<>();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        productoIdInput = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
+        cantidadInput = new javax.swing.JTextField();
+        nuevoButton = new javax.swing.JButton();
+        finalizarrButton = new javax.swing.JButton();
+        subtotalInput = new javax.swing.JTextField();
+        jLabel17 = new javax.swing.JLabel();
+        ivaInput1 = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
+        totalInput1 = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
         jLabel1 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel6.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel6.setText("Folio");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
-
-        folioInput.setEditable(false);
-        getContentPane().add(folioInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 110, 30));
-
-        jLabel7.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setText("Usuario");
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, -1, -1));
-
-        clienteIdInput.setEditable(false);
-        getContentPane().add(clienteIdInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 110, 30));
-
-        jLabel8.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel8.setText("Seleccione cliente");
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, -1, -1));
-
-        jLabel10.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel10.setText("ClienteID");
-        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, -1, 20));
-
-        clienteInput.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                clienteInputActionPerformed(evt);
-            }
-        });
-        getContentPane().add(clienteInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 270, 30));
-
-        nuevoButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        nuevoButton.setText("Nueva venta");
-        nuevoButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nuevoButtonActionPerformed(evt);
-            }
-        });
-        getContentPane().add(nuevoButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 460, 110, 40));
-
-        finalizarrButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        finalizarrButton.setText("Finalizar venta");
-        finalizarrButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                finalizarrButtonActionPerformed(evt);
-            }
-        });
-        getContentPane().add(finalizarrButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 460, 140, 40));
-
-        jLabel11.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel11.setText("Precio");
-        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, -1, -1));
-
-        precioInput.setEditable(false);
-        getContentPane().add(precioInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 220, 270, 30));
-
-        jLabel12.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel12.setText("Fecha");
-        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 20, -1, -1));
-        getContentPane().add(fechaInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, 160, 30));
-
-        jLabel13.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel13.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel13.setText("Usuario");
-        getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, -1, -1));
-
-        productoIdInput.setEditable(false);
-        getContentPane().add(productoIdInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 160, 110, 30));
-
-        jLabel14.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel14.setText("Seleccione Producto");
-        getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 80, -1, -1));
-
-        jLabel15.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel15.setText("ProductoID");
-        getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 140, -1, 20));
-
-        productoInput.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                productoInputActionPerformed(evt);
-            }
-        });
-        getContentPane().add(productoInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 100, 270, 30));
-
-        jLabel16.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel16.setText("Cantidad");
-        getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 200, -1, -1));
-        getContentPane().add(cantidadInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 220, 130, 30));
-
-        agregarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        agregarButton.setText("Agregar");
-        agregarButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                agregarButtonActionPerformed(evt);
-            }
-        });
-        getContentPane().add(agregarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 220, 110, 30));
-
-        quitarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        quitarButton.setText("Quitar");
-        quitarButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                quitarButtonActionPerformed(evt);
-            }
-        });
-        getContentPane().add(quitarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 220, 110, 30));
-
-        jLabel17.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel17.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel17.setText("Subtotal");
-        getContentPane().add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 450, -1, -1));
-
-        subtotalInput.setEditable(false);
-        getContentPane().add(subtotalInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 470, 110, 30));
+        ivaInput.setEditable(false);
 
         jLabel18.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
         jLabel18.setForeground(new java.awt.Color(255, 255, 255));
         jLabel18.setText("IVA");
-        getContentPane().add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 450, -1, -1));
-
-        ivaInput.setEditable(false);
-        getContentPane().add(ivaInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 470, 110, 30));
 
         totalInput.setEditable(false);
-        getContentPane().add(totalInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 470, 110, 30));
 
         jLabel19.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
         jLabel19.setForeground(new java.awt.Color(255, 255, 255));
         jLabel19.setText("Total");
-        getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 450, -1, -1));
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         ticketTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -232,7 +196,117 @@ public class VentasView extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(ticketTable);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 267, 800, 170));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 267, 780, 170));
+
+        precioInput.setEditable(false);
+        getContentPane().add(precioInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 220, 270, 30));
+
+        jLabel11.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel11.setText("Precio");
+        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, -1, -1));
+
+        clienteIdInput.setEditable(false);
+        getContentPane().add(clienteIdInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 110, 30));
+
+        jLabel10.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel10.setText("ClienteID");
+        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, -1, 20));
+
+        clienteInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clienteInputActionPerformed(evt);
+            }
+        });
+        getContentPane().add(clienteInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 270, 30));
+
+        jLabel8.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setText("Seleccione cliente");
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, -1, -1));
+
+        folioInput.setEditable(false);
+        getContentPane().add(folioInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 110, 30));
+
+        jLabel6.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("Folio");
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
+
+        jLabel12.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel12.setText("Fecha");
+        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 20, -1, -1));
+
+        productoInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                productoInputActionPerformed(evt);
+            }
+        });
+        getContentPane().add(productoInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 100, 270, 30));
+
+        jLabel14.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel14.setText("Seleccione Producto");
+        getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 80, -1, -1));
+
+        jLabel15.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel15.setText("ProductoID");
+        getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 140, -1, 20));
+
+        productoIdInput.setEditable(false);
+        getContentPane().add(productoIdInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 160, 110, 30));
+
+        jLabel16.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel16.setText("Cantidad");
+        getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 200, -1, -1));
+        getContentPane().add(cantidadInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 220, 130, 30));
+
+        nuevoButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        nuevoButton.setText("Nueva venta");
+        nuevoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nuevoButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(nuevoButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 460, 110, 40));
+
+        finalizarrButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        finalizarrButton.setText("Finalizar venta");
+        finalizarrButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                finalizarrButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(finalizarrButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 460, 140, 40));
+
+        subtotalInput.setEditable(false);
+        getContentPane().add(subtotalInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 470, 110, 30));
+
+        jLabel17.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel17.setText("Subtotal");
+        getContentPane().add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 450, -1, -1));
+
+        ivaInput1.setEditable(false);
+        getContentPane().add(ivaInput1, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 470, 110, 30));
+
+        jLabel20.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel20.setText("IVA");
+        getContentPane().add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 450, -1, -1));
+
+        totalInput1.setEditable(false);
+        getContentPane().add(totalInput1, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 470, 110, 30));
+
+        jLabel21.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel21.setText("Total");
+        getContentPane().add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 450, -1, -1));
+        getContentPane().add(jDateChooser1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, 270, 30));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/bg-dblue.jpg"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, 520));
@@ -244,6 +318,10 @@ public class VentasView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_clienteInputActionPerformed
 
+    private void productoInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productoInputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_productoInputActionPerformed
+
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_nuevoButtonActionPerformed
@@ -251,18 +329,6 @@ public class VentasView extends javax.swing.JFrame {
     private void finalizarrButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finalizarrButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_finalizarrButtonActionPerformed
-
-    private void productoInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productoInputActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_productoInputActionPerformed
-
-    private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_agregarButtonActionPerformed
-
-    private void quitarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitarButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_quitarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -301,36 +367,36 @@ public class VentasView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton agregarButton;
     private javax.swing.JTextField cantidadInput;
     private javax.swing.JTextField clienteIdInput;
     private javax.swing.JComboBox<String> clienteInput;
-    private javax.swing.JTextField fechaInput;
     private javax.swing.JButton finalizarrButton;
     private javax.swing.JTextField folioInput;
     private javax.swing.JTextField ivaInput;
+    private javax.swing.JTextField ivaInput1;
+    private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton nuevoButton;
     private javax.swing.JTextField precioInput;
     private javax.swing.JTextField productoIdInput;
     private javax.swing.JComboBox<String> productoInput;
-    private javax.swing.JButton quitarButton;
     private javax.swing.JTextField subtotalInput;
     private javax.swing.JTable ticketTable;
     private javax.swing.JTextField totalInput;
+    private javax.swing.JTextField totalInput1;
     // End of variables declaration//GEN-END:variables
 }

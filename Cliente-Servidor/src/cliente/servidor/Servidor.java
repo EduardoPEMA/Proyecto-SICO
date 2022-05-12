@@ -8,6 +8,7 @@ package cliente.servidor;
 import classes.Clientes;
 import classes.Producto;
 import classes.Usuarios;
+import classes.Venta;
 import databases.DBCliente;
 import databases.DBProducto;
 import databases.DBUsuarios;
@@ -19,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.*;
 
@@ -102,6 +104,7 @@ public class Servidor extends javax.swing.JFrame {
                     Usuarios us = new Usuarios();
                     Clientes cli = new Clientes();
                     Producto pro = new Producto();
+                    Venta ven = new Venta();
                     System.out.println("Enviar-cliente " + recibirPaquete);
                     conn = con.Conexion();
                     mensaje = variables[0];
@@ -253,6 +256,17 @@ public class Servidor extends javax.swing.JFrame {
                                     pro.setId(Integer.parseInt(variables[2]));
                                     DBProducto db = new DBProducto(conn);
                                     db.eliminarProducto(pro);
+                                    break;
+                                }
+                                case "listar": {
+                                    DBProducto db = new DBProducto(conn);
+                                    mensaje = db.listarProductos();
+                                    mensajeAlerta = "listar";
+                                    if (mensaje.length() == 0) {
+                                        mensaje = "No hay resultados";
+                                        mensajeAlerta = "No hay resultados";
+                                        mostrarMensaje("Sin resultados");
+                                    }
                                     break;
                                 }
                             }

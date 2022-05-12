@@ -86,11 +86,22 @@ public class DBProducto {
         String result = "";
         String sql = "SELECT * FROM productos WHERE descripcion = ? LIMIT 1";
         ps = conn.prepareStatement(sql);
-        ps.setString(1,pro.getDescripcion());
+        ps.setString(1, pro.getDescripcion());
         rs = ps.executeQuery();
         while (rs.next()) {
             result += rs.getString("id") + " " + rs.getString("descripcion") + " " + rs.getString("stock")
                     + " " + rs.getString("precio") + " \n";
+        }
+        return result;
+    }
+
+    public String listarProductos() throws SQLException {
+        String result = "";
+        String sql = "SELECT * FROM productos WHERE stock > 0";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        rs = stmt.executeQuery();
+        while (rs.next()) {
+            result += rs.getString("descripcion") + " \n";
         }
         return result;
     }
