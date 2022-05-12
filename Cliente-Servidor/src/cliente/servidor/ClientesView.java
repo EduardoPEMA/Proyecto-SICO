@@ -13,6 +13,7 @@ import java.net.SocketException;
 import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import utils.Utils;
 
@@ -44,12 +45,14 @@ public class ClientesView extends javax.swing.JFrame {
         try {
             initComponents();
             this.setLocationRelativeTo(null);
+            this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
             setEstado(false);
             permitirAccion();
             conexion = new Conexion();
             socket = new DatagramSocket();
             idInput.setEnabled(false);
-            
+
         } catch (SocketException ex) {
             Logger.getLogger(ClientesView.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -238,8 +241,8 @@ public class ClientesView extends javax.swing.JFrame {
         boolean permitir = getEstados();
         guardarButton.setEnabled(permitir);
     }
-    
-        public void limpiarTexto() {
+
+    public void limpiarTexto() {
         nombreInput.setText("");
         rfcInput.setText("");
         telefonoInput.setText("");
@@ -407,7 +410,7 @@ public class ClientesView extends javax.swing.JFrame {
     private void emailInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_emailInputKeyReleased
         // TODO add your handling code here:
         String aux = emailInput.getText();
-        emailIsValid =  !aux.equals("");
+        emailIsValid = !aux.equals("");
         permitirAccion();
     }//GEN-LAST:event_emailInputKeyReleased
 

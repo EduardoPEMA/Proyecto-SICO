@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -42,7 +43,7 @@ public class VentasView extends javax.swing.JFrame {
         try {
             initComponents();
             this.setLocationRelativeTo(null);
-
+            this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             tablaVentas = (DefaultTableModel) ticketTable.getModel();
             ticketTable.setAutoCreateRowSorter(true);
             ticketTable.getRowSorter().toggleSortOrder(0);

@@ -13,6 +13,7 @@ import java.net.SocketException;
 import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import utils.Utils;
 
@@ -43,6 +44,7 @@ public class ProductosView extends javax.swing.JFrame {
         try {
             initComponents();
             this.setLocationRelativeTo(null);
+            this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setEstado(false);
             permitirAccion();
             conexion = new Conexion();
