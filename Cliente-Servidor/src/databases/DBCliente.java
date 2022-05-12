@@ -102,5 +102,17 @@ public class DBCliente {
         
         return result;
     }
+    
+    public String listarClientes() throws SQLException {
+        String result = "";
+        String sql = "SELECT * FROM clientes";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        rs = stmt.executeQuery();
+        while (rs.next()) {
+            result +=  rs.getString("id") + " " + rs.getString("nombre") + "," + " \n";
+        }
+        System.out.println(result);
+        return result;
+    }
 
 }

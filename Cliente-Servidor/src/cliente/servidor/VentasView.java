@@ -49,7 +49,10 @@ public class VentasView extends javax.swing.JFrame {
             ticketTable.getRowSorter().toggleSortOrder(0);
             conexion = new Conexion();
             socket = new DatagramSocket();
+            clienteIdInput.setEnabled(false);
+            productoIdInput.setEnabled(false);
             getCatalogoProductos();
+            getCatalogoClientes();
 
         } catch (SocketException ex) {
             Logger.getLogger(VentasView.class.getName()).log(Level.SEVERE, null, ex);
@@ -73,6 +76,26 @@ public class VentasView extends javax.swing.JFrame {
         }
         try {
             esperarPaquetes(true, productoInput);
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void getCatalogoClientes() {
+        try {
+//obtener mensaje del campo de texto y convertirlo en arreglo byte
+            String mensaje = "cliente" + " " + "listar" + " ";
+            byte datos[] = mensaje.getBytes();
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete); //enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            esperarPaquetes(true, clienteInput);
             socket = new DatagramSocket();
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
@@ -106,9 +129,9 @@ public class VentasView extends javax.swing.JFrame {
                 return;
             }
             String[] variables;
-            variables = cad.split(" ");
+            variables = cad.split(",");
 
-            if(isCatalogue) {
+            if (isCatalogue) {
                 setValuesCB(variables, comboBox);
             }
         } catch (IOException excepcion) {
@@ -240,9 +263,19 @@ public class VentasView extends javax.swing.JFrame {
         jLabel12.setText("Fecha");
         getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 20, -1, -1));
 
+        productoInput.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                productoInputItemStateChanged(evt);
+            }
+        });
         productoInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 productoInputActionPerformed(evt);
+            }
+        });
+        productoInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                productoInputKeyPressed(evt);
             }
         });
         getContentPane().add(productoInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 100, 270, 30));
@@ -315,12 +348,19 @@ public class VentasView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public String getId(String s) {
+        if (s.contains(" ")) {
+            s = s.substring(0, s.indexOf(" "));
+        }
+        return s;
+    }
     private void clienteInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clienteInputActionPerformed
         // TODO add your handling code here:
+        clienteIdInput.setText(getId((String) clienteInput.getSelectedItem()));
     }//GEN-LAST:event_clienteInputActionPerformed
 
     private void productoInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productoInputActionPerformed
-        // TODO add your handling code here:
+        productoIdInput.setText(getId((String) productoInput.getSelectedItem()));
     }//GEN-LAST:event_productoInputActionPerformed
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
@@ -330,6 +370,16 @@ public class VentasView extends javax.swing.JFrame {
     private void finalizarrButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finalizarrButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_finalizarrButtonActionPerformed
+
+    private void productoInputItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_productoInputItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_productoInputItemStateChanged
+
+    private void productoInputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_productoInputKeyPressed
+        // TODO add your handling code here:
+        System.out.println(productoInput.getSelectedItem());
+        productoIdInput.setText(getId((String) productoInput.getSelectedItem()));
+    }//GEN-LAST:event_productoInputKeyPressed
 
     /**
      * @param args the command line arguments
