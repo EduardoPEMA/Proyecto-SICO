@@ -112,15 +112,22 @@ public class Servidor extends javax.swing.JFrame {
                         case "usuario": {
                             switch (variables[1]) {
                                 case "insertar": {
-                                    mensajeAlerta = "insertado";
-
+                                    result = "";
+                                    mensajeAlerta = "buscando";
                                     us.setNombre(variables[2]);
-                                    us.setUsername(variables[3]);
-                                    us.setRol(variables[4]);
-                                    us.setPassword(variables[5]);
-
                                     DBUsuarios db = new DBUsuarios(conn);
-                                    db.guardarUsuario(us);
+                                    mensaje = db.buscarUsuario(us);
+                                    if (mensaje.length() == 0) {
+                                        mensajeAlerta = "insertado";
+                                        mensaje = "El usuario ha sido registrado con exito";
+                                        us.setNombre(variables[2]);
+                                        us.setUsername(variables[3]);
+                                        us.setRol(variables[4]);
+                                        us.setPassword(variables[5]);
+                                        db.guardarUsuario(us);
+                                        break;
+                                    }
+                                    mensaje = "Ya existe un usuario con ese nombre";
                                     break;
                                 }
                                 case "buscar": {
@@ -137,10 +144,6 @@ public class Servidor extends javax.swing.JFrame {
                                     break;
                                 }
                                 case "editar": {
-                                    System.out.println(variables[3]);
-                                    System.out.println(variables[4]);
-                                    System.out.println(variables[5]);
-                                    System.out.println(variables[6]);
                                     mensajeAlerta = "editado";
                                     us.setNombre(variables[2]);
                                     us.setUsername(variables[3]);
@@ -149,12 +152,13 @@ public class Servidor extends javax.swing.JFrame {
                                     us.setId(Integer.parseInt(variables[6]));
                                     DBUsuarios db = new DBUsuarios(conn);
                                     db.editarUsuario(us);
+                                    mensaje = "Usuario editado con exito";
                                     break;
                                 }
                                 case "eliminar": {
                                     mensajeAlerta = "eliminar";
+                                    mensaje = "Usuario eliminado con exito";
                                     us.setId(Integer.parseInt(variables[2]));
-
                                     DBUsuarios db = new DBUsuarios(conn);
                                     db.eliminarUsuario(us);
                                     break;
@@ -179,13 +183,22 @@ public class Servidor extends javax.swing.JFrame {
                         case "cliente": {
                             switch (variables[1]) {
                                 case "insertar": {
-                                    mensajeAlerta = "insertado";
+                                    result = "";
+                                    mensajeAlerta = "encontrado";
                                     cli.setNombre(variables[2]);
-                                    cli.setRfc(variables[3]);
-                                    cli.setTelefono(variables[4]);
-                                    cli.setEmail(variables[5]);
                                     DBCliente db = new DBCliente(conn);
-                                    db.guardarCliente(cli);
+                                    mensaje = db.buscarCliente(cli);
+                                    if (mensaje.length() == 0) {
+                                        mensajeAlerta = "insertado";
+                                        mensaje = "El cliente ha sido registrado con exito";
+                                        cli.setNombre(variables[2]);
+                                        cli.setRfc(variables[3]);
+                                        cli.setTelefono(variables[4]);
+                                        cli.setEmail(variables[5]);
+                                        db.guardarCliente(cli);
+                                        break;
+                                    }
+                                    mensaje = "Ya existe un cliente con ese nombre";
                                     break;
                                 }
                                 case "buscar": {
@@ -210,6 +223,8 @@ public class Servidor extends javax.swing.JFrame {
                                     cli.setId(Integer.parseInt(variables[6]));
                                     DBCliente db = new DBCliente(conn);
                                     db.editarCliente(cli);
+                                    mensaje = "Cliente editado con exito";
+
                                     break;
                                 }
                             }
@@ -218,13 +233,21 @@ public class Servidor extends javax.swing.JFrame {
                         case "producto": {
                             switch (variables[1]) {
                                 case "insertar": {
-                                    mensajeAlerta = "insertado";
-
+                                    result = "";
+                                    mensajeAlerta = "buscando";
                                     pro.setDescripcion(variables[2]);
-                                    pro.setStock(variables[3]);
-                                    pro.setPrecio(variables[4]);
                                     DBProducto db = new DBProducto(conn);
-                                    db.guardarProducto(pro);
+                                    mensaje = db.buscarProducto(pro);
+                                    if (mensaje.length() == 0) {
+                                        mensaje = "El producto ha sido registrado con exito";
+                                        mensajeAlerta = "insertado";
+                                        pro.setDescripcion(variables[2]);
+                                        pro.setStock(variables[3]);
+                                        pro.setPrecio(variables[4]);
+                                        db.guardarProducto(pro);
+                                        break;
+                                    }
+                                    mensaje = "Ya existe un producto con ese nombre";
                                     break;
                                 }
                                 case "buscar": {
@@ -249,6 +272,7 @@ public class Servidor extends javax.swing.JFrame {
                                     pro.setId(Integer.parseInt(variables[5]));
                                     DBProducto db = new DBProducto(conn);
                                     db.editarProducto(pro);
+                                    mensaje = "Producto editado con exito";
                                     break;
                                 }
                                 case "eliminar": {
@@ -256,6 +280,7 @@ public class Servidor extends javax.swing.JFrame {
                                     pro.setId(Integer.parseInt(variables[2]));
                                     DBProducto db = new DBProducto(conn);
                                     db.eliminarProducto(pro);
+                                    mensaje = "Producto eliminado con exito";
                                     break;
                                 }
                                 case "listar": {

@@ -41,7 +41,7 @@ public class LoginView extends javax.swing.JFrame {
             this.setLocationRelativeTo(null);
 
         } catch (SocketException ex) {
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoginView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -99,8 +99,8 @@ public class LoginView extends javax.swing.JFrame {
 
         iniciarButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        passwordInput = new javax.swing.JTextField();
         userInput = new javax.swing.JTextField();
+        passwordInput = new javax.swing.JPasswordField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -121,13 +121,6 @@ public class LoginView extends javax.swing.JFrame {
         jLabel2.setText("jLabel2");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 30, 160, 130));
 
-        passwordInput.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                passwordInputKeyReleased(evt);
-            }
-        });
-        getContentPane().add(passwordInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 270, 270, 40));
-
         userInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 userInputActionPerformed(evt);
@@ -139,6 +132,13 @@ public class LoginView extends javax.swing.JFrame {
             }
         });
         getContentPane().add(userInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 200, 270, 40));
+
+        passwordInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                passwordInputKeyReleased(evt);
+            }
+        });
+        getContentPane().add(passwordInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 270, 270, 40));
 
         jLabel3.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -241,7 +241,7 @@ public class LoginView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JTextField passwordInput;
+    private javax.swing.JPasswordField passwordInput;
     private javax.swing.JTextField userInput;
     // End of variables declaration//GEN-END:variables
 }

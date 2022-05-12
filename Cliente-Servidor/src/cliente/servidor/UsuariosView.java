@@ -96,6 +96,11 @@ public class UsuariosView extends javax.swing.JFrame {
                 buscarInputActionPerformed(evt);
             }
         });
+        buscarInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                buscarInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(buscarInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 40, 270, 40));
 
         jLabel4.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -295,8 +300,6 @@ public class UsuariosView extends javax.swing.JFrame {
 
             String mensaje = "usuario" + " " + "insertar" + " " + nombre + " " + username + " " + perfil + " " + password;
             byte datos[] = mensaje.getBytes();
-            JOptionPane.showMessageDialog(null, "Guardar usuario...", "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
             DatagramPacket enviarPaquete = new DatagramPacket(datos,
                     datos.length, InetAddress.getLocalHost(), 5000);
             socket.send(enviarPaquete);//enviar paquete
@@ -304,9 +307,8 @@ public class UsuariosView extends javax.swing.JFrame {
             exceptionES.printStackTrace();
         }
         try {
+            esperarPaquetes();
             socket = new DatagramSocket();
-            buscar(nombreInput.getText());
-            guardarButton.setEnabled(false);
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
             System.exit(1);
@@ -331,8 +333,6 @@ public class UsuariosView extends javax.swing.JFrame {
 
             String mensaje = "usuario" + " " + "editar" + " " + nombre + " " + username + " " + password + " " + perfil + " " + id;
             byte datos[] = mensaje.getBytes();
-            JOptionPane.showMessageDialog(null, "Editar usuario...", "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
             DatagramPacket enviarPaquete = new DatagramPacket(datos,
                     datos.length, InetAddress.getLocalHost(), 5000);
             socket.send(enviarPaquete);//enviar paquete
@@ -340,6 +340,7 @@ public class UsuariosView extends javax.swing.JFrame {
             exceptionES.printStackTrace();
         }
         try {
+            esperarPaquetes();
             socket = new DatagramSocket();
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
@@ -358,9 +359,6 @@ public class UsuariosView extends javax.swing.JFrame {
             id = idInput.getText();
             String mensaje = "usuario" + " " + "eliminar" + " " + id;
             byte datos[] = mensaje.getBytes();
-//crear enviarPaquete
-            JOptionPane.showMessageDialog(null, "Eliminar usuario...", "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
             DatagramPacket enviarPaquete = new DatagramPacket(datos,
                     datos.length, InetAddress.getLocalHost(), 5000);
             socket.send(enviarPaquete);//enviar paquete
@@ -369,6 +367,7 @@ public class UsuariosView extends javax.swing.JFrame {
             exceptionES.printStackTrace();
         }
         try {
+            esperarPaquetes();
             socket = new DatagramSocket();
         } //atrapar los problemas que puedan ocurrir al crear objeto DatagramSocket
         catch (SocketException excepcionSocket) {
@@ -411,6 +410,15 @@ public class UsuariosView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_buscarInputActionPerformed
 
+    private void buscarInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarInputKeyReleased
+String aux = buscarInput.getText();
+        if (!aux.equals("")) {
+            buscarButton.setEnabled(true);
+        } else {
+            buscarButton.setEnabled(false);
+        }        
+    }//GEN-LAST:event_buscarInputKeyReleased
+
     private void esperarPaquetes() {
         try {
 //establecer el paquete
@@ -428,6 +436,24 @@ public class UsuariosView extends javax.swing.JFrame {
             if (cad.equals("No hay resultados")) {
                 JOptionPane.showMessageDialog(null, "No hay resultados.");
                 limpiarTexto();
+                return;
+            }          
+            if (cad.equals("Ya existe un usuario con ese nombre")) {
+                JOptionPane.showMessageDialog(null, cad);
+                return;
+            }
+            if (cad.equals("El usuario ha sido registrado con exito")) {
+                buscar(nombreInput.getText());
+                guardarButton.setEnabled(false);
+                JOptionPane.showMessageDialog(null, cad);
+                return;
+            }
+            if(cad.equals("Usuario editado con exito")) {
+                JOptionPane.showMessageDialog(null, cad);
+                return;
+            }
+            if(cad.equals("Usuario eliminado con exito")) {
+                JOptionPane.showMessageDialog(null, cad);
                 return;
             }
             setEstado(true);
@@ -453,6 +479,7 @@ public class UsuariosView extends javax.swing.JFrame {
         perfilInput.setSelectedIndex(0);
         buscarInput.setText("");
         idInput.setText("");
+        buscarButton.setEnabled(false);
     }
 
     public void buscar(String busqueda) {

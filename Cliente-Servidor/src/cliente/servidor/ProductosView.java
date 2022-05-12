@@ -34,12 +34,12 @@ public class ProductosView extends javax.swing.JFrame {
     private boolean stockIsValid = false;
     private boolean precioIsValid = false;
     private Utils utils = new Utils();
-
+    
     public Connection connection;
     private DatagramSocket socket;
-
+    
     Conexion conexion;
-
+    
     public ProductosView() {
         try {
             initComponents();
@@ -50,22 +50,23 @@ public class ProductosView extends javax.swing.JFrame {
             conexion = new Conexion();
             socket = new DatagramSocket();
             idInput.setEnabled(false);
-
+            
         } catch (SocketException ex) {
             Logger.getLogger(ClientesView.class.getName()).log(Level.SEVERE, null, ex);
-
+            
         }
     }
-
+    
     private void setEstado(Boolean state) {
         editarButton.setEnabled(state);
+        eliminarButton.setEnabled(state);
         guardarButton.setEnabled(state);
         stockInput.setEnabled(state);
         descripcionInput.setEnabled(state);
         precioInput.setEnabled(state);
         limpiarTexto();
     }
-
+    
     public void buscar(String busqueda) {
         try {
 //obtener mensaje del campo de texto y convertirlo en arreglo byte
@@ -85,7 +86,7 @@ public class ProductosView extends javax.swing.JFrame {
             System.exit(1);
         }
     }
-
+    
     private void esperarPaquetes() {
         try {
 //establecer el paquete
@@ -104,6 +105,24 @@ public class ProductosView extends javax.swing.JFrame {
                 limpiarTexto();
                 return;
             }
+            if (cad.equals("Ya existe un producto con esa descripcion")) {
+                JOptionPane.showMessageDialog(null, cad);
+                return;
+            }
+            if (cad.equals("El producto ha sido registrado con exito")) {
+                buscar(descripcionInput.getText());
+                guardarButton.setEnabled(false);
+                JOptionPane.showMessageDialog(null, cad);
+                return;
+            }
+            if (cad.equals("Producto editado con exito")) {
+                JOptionPane.showMessageDialog(null, cad);
+                return;
+            }
+            if (cad.equals("Producto eliminado con exito")) {
+                JOptionPane.showMessageDialog(null, cad);
+                return;
+            }
             setEstado(true);
             String[] variables;
             variables = cad.split(" ");
@@ -111,7 +130,8 @@ public class ProductosView extends javax.swing.JFrame {
             descripcionInput.setText(variables[1]);
             stockInput.setText(variables[2]);
             precioInput.setText(variables[3]);
-
+            guardarButton.setEnabled(false);
+            
         } catch (IOException excepcion) {
             excepcion.printStackTrace();
         }
@@ -123,12 +143,13 @@ public class ProductosView extends javax.swing.JFrame {
         precioInput.setText("");
         buscarInput.setText("");
         idInput.setText("");
+        buscarButton.setEnabled(false);
     }
-
+    
     private boolean getEstados() {
         return descripcionIsValid && stockIsValid && precioIsValid;
     }
-
+    
     private void permitirAccion() {
         boolean permitir = getEstados();
         guardarButton.setEnabled(permitir);
@@ -165,6 +186,12 @@ public class ProductosView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        buscarInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                buscarInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(buscarInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 40, 270, 40));
 
         jLabel4.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -206,9 +233,15 @@ public class ProductosView extends javax.swing.JFrame {
 
         buscarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
         buscarButton.setText("Buscar");
+        buscarButton.setEnabled(false);
         buscarButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buscarButtonActionPerformed(evt);
+            }
+        });
+        buscarButton.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                buscarButtonKeyReleased(evt);
             }
         });
         getContentPane().add(buscarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 40, 130, 40));
@@ -299,9 +332,9 @@ public class ProductosView extends javax.swing.JFrame {
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
         // TODO add your handling code here:
         setEstado(true);
-        if (idInput.getText().equals("")) {
-            editarButton.setEnabled(false);
-        }
+        editarButton.setEnabled(false);
+        eliminarButton.setEnabled(false);
+
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
     private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
@@ -312,8 +345,6 @@ public class ProductosView extends javax.swing.JFrame {
             precio = precioInput.getText();
             String mensaje = "producto" + " " + "insertar" + " " + descripcion + " " + stock + " " + precio;
             byte datos[] = mensaje.getBytes();
-            JOptionPane.showMessageDialog(null, "Agregando producto...", "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
             DatagramPacket enviarPaquete = new DatagramPacket(datos,
                     datos.length, InetAddress.getLocalHost(), 5000);
             socket.send(enviarPaquete);//enviar paquete
@@ -321,9 +352,8 @@ public class ProductosView extends javax.swing.JFrame {
             exceptionES.printStackTrace();
         }
         try {
+            esperarPaquetes();
             socket = new DatagramSocket();
-            buscar(descripcionInput.getText());
-            guardarButton.setEnabled(false);
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
             System.exit(1);
@@ -333,7 +363,7 @@ public class ProductosView extends javax.swing.JFrame {
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
         // TODO add your handling code here:
         if (idInput.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "No se encontró el usuario a editar",
+            JOptionPane.showMessageDialog(null, "No se encontró el producto a editar",
                     "Error :(", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -344,9 +374,6 @@ public class ProductosView extends javax.swing.JFrame {
             id = idInput.getText();
             String mensaje = "producto" + " " + "editar" + " " + descripcion + " " + stock + " " + precio + " " + id;
             byte datos[] = mensaje.getBytes();
-            JOptionPane.showMessageDialog(null, "Editar producto...", "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
-//crear enviarPaquete
             DatagramPacket enviarPaquete = new DatagramPacket(datos,
                     datos.length, InetAddress.getLocalHost(), 5000);
             socket.send(enviarPaquete);//enviar paquete
@@ -354,6 +381,7 @@ public class ProductosView extends javax.swing.JFrame {
             exceptionES.printStackTrace();
         }
         try {
+            esperarPaquetes();
             socket = new DatagramSocket();
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
@@ -364,7 +392,7 @@ public class ProductosView extends javax.swing.JFrame {
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
         // TODO add your handling code here:
         if (idInput.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "No se encontró el usuario a editar",
+            JOptionPane.showMessageDialog(null, "No se encontró el producto a editar",
                     "Error :(", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -372,9 +400,6 @@ public class ProductosView extends javax.swing.JFrame {
             id = idInput.getText();
             String mensaje = "producto" + " " + "eliminar" + " " + id;
             byte datos[] = mensaje.getBytes();
-            JOptionPane.showMessageDialog(null, "Eliminar producto...", "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
-//crear enviarPaquete
             DatagramPacket enviarPaquete = new DatagramPacket(datos,
                     datos.length, InetAddress.getLocalHost(), 5000);
             socket.send(enviarPaquete);//enviar paquete
@@ -383,6 +408,7 @@ public class ProductosView extends javax.swing.JFrame {
             exceptionES.printStackTrace();
         }
         try {
+            esperarPaquetes();
             socket = new DatagramSocket();
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
@@ -407,6 +433,21 @@ public class ProductosView extends javax.swing.JFrame {
         precioIsValid = utils.isNumber(aux);
         permitirAccion();
     }//GEN-LAST:event_precioInputKeyReleased
+
+    private void buscarButtonKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarButtonKeyReleased
+        
+
+    }//GEN-LAST:event_buscarButtonKeyReleased
+
+    private void buscarInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarInputKeyReleased
+// TODO add your handling code here:
+        String aux = buscarInput.getText();
+        if (!aux.equals("")) {
+            buscarButton.setEnabled(true);
+        } else {
+            buscarButton.setEnabled(false);
+        }
+    }//GEN-LAST:event_buscarInputKeyReleased
 
     /**
      * @param args the command line arguments
