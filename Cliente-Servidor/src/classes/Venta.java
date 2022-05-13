@@ -20,15 +20,6 @@ public class Venta {
     private String total;
     private String cliente_id;
 
-    private static AtomicInteger nextFolio = new AtomicInteger(0);
-    private static ArrayList<Integer> ID_VALIDOS = new ArrayList<>();
-
-    public Venta() {
-        do {
-            folio = "CE-00" + nextFolio.incrementAndGet();
-        } while (ID_VALIDOS.contains(id));
-    }
-
     public int getId() {
         return id;
     }

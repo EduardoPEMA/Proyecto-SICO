@@ -60,6 +60,8 @@ public class VentasView extends javax.swing.JFrame {
             socket = new DatagramSocket();
             clienteIdInput.setEnabled(false);
             productoIdInput.setEnabled(false);
+            agregarButton.setEnabled(false);
+            setEstado(false);
             getCatalogoProductos();
             getCatalogoClientes();
             updatePrices();
@@ -74,6 +76,17 @@ public class VentasView extends javax.swing.JFrame {
 
     public void limpiarTexto() {
         precioInput.setText("");
+        folioInput.setText("");
+        cantidadInput.setText("");
+        precioInput.setText("");
+        totalInput1.setText("");
+        ivaInput1.setText("");
+        subtotalInput.setText("");
+        clienteIdInput.setText("");
+        productoIdInput.setText("");
+        productoInput.setSelectedIndex(-1);
+        clienteInput.setSelectedIndex(-1);
+        tablaVentas.setRowCount(0);
     }
 
     private void getCatalogoProductos() {
@@ -94,6 +107,14 @@ public class VentasView extends javax.swing.JFrame {
             excepcionSocket.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private void setEstado(Boolean state) {
+        clienteInput.setEnabled(state);
+        productoInput.setEnabled(state);
+        cantidadInput.setEnabled(state);
+        quitarButton.setEnabled(state);
+        finalizarrButton.setEnabled(state);
     }
 
     private void getCatalogoClientes() {
@@ -348,6 +369,11 @@ public class VentasView extends javax.swing.JFrame {
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 267, 780, 170));
 
         precioInput.setEditable(false);
+        precioInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                precioInputActionPerformed(evt);
+            }
+        });
         getContentPane().add(precioInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 220, 270, 30));
 
         jLabel11.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
@@ -474,7 +500,7 @@ public class VentasView extends javax.swing.JFrame {
         getContentPane().add(jDateChooser1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, 270, 30));
 
         agregarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        agregarButton.setText("agregar");
+        agregarButton.setText("Agregar");
         agregarButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 agregarButtonActionPerformed(evt);
@@ -483,7 +509,7 @@ public class VentasView extends javax.swing.JFrame {
         getContentPane().add(agregarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 220, 80, 30));
 
         quitarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
-        quitarButton.setText("quitar producto");
+        quitarButton.setText("Eliminar producto");
         quitarButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 quitarButtonActionPerformed(evt);
@@ -524,13 +550,20 @@ public class VentasView extends javax.swing.JFrame {
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
         // TODO add your handling code here:
-        Venta v = new Venta();
-        folioInput.setText(String.valueOf(v.getFolio()));
+        UUID id = UUID.randomUUID();
+        folioInput.setText(id.toString());
+        setEstado(true);
+        nuevoButton.setEnabled(false);
 
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
     private void finalizarrButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finalizarrButtonActionPerformed
         vender();
+        limpiarTexto();
+        nuevoButton.setEnabled(true);
+        finalizarrButton.setEnabled(false);
+        agregarButton.setEnabled(false);
+        quitarButton.setEnabled(false);
     }//GEN-LAST:event_finalizarrButtonActionPerformed
 
     private void productoInputItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_productoInputItemStateChanged
@@ -572,6 +605,10 @@ public class VentasView extends javax.swing.JFrame {
             agregarButton.setEnabled(false);
         }
     }//GEN-LAST:event_cantidadInputKeyReleased
+
+    private void precioInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_precioInputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_precioInputActionPerformed
 
     /**
      * @param args the command line arguments
