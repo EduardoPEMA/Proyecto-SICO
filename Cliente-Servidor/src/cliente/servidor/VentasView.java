@@ -16,6 +16,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.sql.Connection;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -227,14 +228,15 @@ public class VentasView extends javax.swing.JFrame {
         double subtotal = 0;
         double iva = 0;
         double total = 0;
+        DecimalFormat df = new DecimalFormat("0.00");
         for (int count = 0; count < tablaVentas.getRowCount(); count++) {
             subtotal += Double.parseDouble(tablaVentas.getValueAt(count, 4).toString());
         }
         iva = subtotal * 0.16;
         total = subtotal + iva;
-        subtotalInput.setText(String.valueOf(subtotal));
-        ivaInput1.setText(String.valueOf(iva));
-        totalInput1.setText(String.valueOf(total));
+        subtotalInput.setText(String.valueOf(df.format(subtotal)));
+        ivaInput1.setText(String.valueOf(df.format(iva)));
+        totalInput1.setText(String.valueOf(df.format(total)));
     }
 
     private Producto encontrarProductos(String value) {
