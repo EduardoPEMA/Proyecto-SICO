@@ -7,6 +7,7 @@ package cliente.servidor;
 
 import classes.Clientes;
 import classes.Producto;
+import com.toedter.calendar.JTextFieldDateEditor;
 import databases.DBVenta;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -17,6 +18,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
@@ -57,6 +60,9 @@ public class VentasView extends javax.swing.JFrame {
             getCatalogoProductos();
             getCatalogoClientes();
             updatePrices();
+            Date date = new Date();
+            jDateChooser1.setDate(date);
+            jDateChooser1.setEnabled(false);
 
         } catch (SocketException ex) {
             Logger.getLogger(VentasView.class.getName()).log(Level.SEVERE, null, ex);
@@ -192,6 +198,52 @@ public class VentasView extends javax.swing.JFrame {
         subtotalInput.setText(String.valueOf(subtotal));
         ivaInput1.setText(String.valueOf(iva));
         totalInput1.setText(String.valueOf(total));
+    }
+    
+    private Producto encontrarProductos (String value) {
+        for (Producto p : productosArray) {
+            if (p.getDescripcion().equals(value)) {
+                return p;
+            }
+        }
+        return new Producto();
+    }
+    
+    private String generarListaProductos(){
+        String lista = "";
+        for (int count = 0; count < tablaVentas.getRowCount(); count++) {
+            Producto p = encontrarProductos(tablaVentas.getValueAt(count, 1).toString());
+            lista += p.getId() + "," + tablaVentas.getValueAt(count, 3).toString() + ",";
+        }
+        return lista;
+}
+    
+    private void vender() {
+        // TODO add your handling code here:
+        try {
+            //obtener mensaje del campo de texto y convertirlo en arreglo byte
+            String folio = folioInput.getText();
+            String fecha = String.valueOf(jDateChooser1.getDate().getTime());
+            String cliente = clienteIdInput.getText();
+            String total = totalInput1.getText();
+            String prod = generarListaProductos();                                    
+            String mensaje = "ventas" + " " + "vender" + " " + folio + " " + fecha + " " + cliente + " " + total + " " + prod;
+            System.out.println(mensaje);
+            byte datos[] = mensaje.getBytes();
+            DatagramPacket enviarPaquete = new DatagramPacket(datos,
+                    datos.length, InetAddress.getLocalHost(), 5000);
+            socket.send(enviarPaquete); //enviar paquete
+        } catch (IOException exceptionES) {
+            exceptionES.printStackTrace();
+        }
+        try {
+            esperarPaquetes("");
+            socket = new DatagramSocket();
+        } catch (SocketException excepcionSocket) {
+            excepcionSocket.printStackTrace();
+            System.exit(1);
+        }
+        
     }
 
     /**
@@ -450,10 +502,13 @@ public class VentasView extends javax.swing.JFrame {
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
         // TODO add your handling code here:
+        UUID id = UUID.randomUUID();
+        folioInput.setText(id.toString());
+
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
     private void finalizarrButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finalizarrButtonActionPerformed
-        // TODO add your handling code here:
+        vender();
     }//GEN-LAST:event_finalizarrButtonActionPerformed
 
     private void productoInputItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_productoInputItemStateChanged
@@ -466,6 +521,10 @@ public class VentasView extends javax.swing.JFrame {
 
     private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
         // TODO add your handling code here:
+        if(Integer.parseInt(cantidadInput.getText()) < 0) {
+            JOptionPane.showMessageDialog(null, "No se pueden agregar cantidad negativas", "error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         addRow();
         updatePrices();
     }//GEN-LAST:event_agregarButtonActionPerformed

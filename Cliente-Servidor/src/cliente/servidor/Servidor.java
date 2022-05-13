@@ -92,7 +92,7 @@ public class Servidor extends javax.swing.JFrame {
         while (true) {//iterar infinitamente
             try {
                 // establecer el paquete
-                byte datos[] = new byte[100];
+                byte datos[] = new byte[20000];
                 DatagramPacket recibirPaquete
                         = new DatagramPacket(datos, datos.length);
                 socket.receive(recibirPaquete);//espera al paquete
@@ -316,6 +316,7 @@ public class Servidor extends javax.swing.JFrame {
                                     
                                     ven.setFolio(variables[2]);
                                     ven.setFecha(variables[3]);
+                                    System.out.println(ven.getFecha());
                                     ven.setCliente(variables[4]);
                                     ven.setTotal(variables[5]);
                                     

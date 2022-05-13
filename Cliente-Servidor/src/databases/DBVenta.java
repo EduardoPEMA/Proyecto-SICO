@@ -79,7 +79,7 @@ public class DBVenta {
     
     public String vender(Venta venta,String[]  productos) throws SQLException {
         String res = "";
-        String sql = "INSERT INTO ventas values (?, ?, ?, ?)";
+        String sql = "INSERT INTO ventas (folio, fecha, total, cliente_id) values (?, DATE(?), ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setString(1, venta.getFolio());
         stmt.setString(2, venta.getFecha());
