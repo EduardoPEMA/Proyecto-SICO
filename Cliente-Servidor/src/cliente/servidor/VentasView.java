@@ -449,6 +449,11 @@ public class VentasView extends javax.swing.JFrame {
         jLabel16.setText("Cantidad");
         getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 200, -1, -1));
 
+        cantidadInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cantidadInputActionPerformed(evt);
+            }
+        });
         cantidadInput.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 cantidadInputKeyReleased(evt);
@@ -564,6 +569,7 @@ public class VentasView extends javax.swing.JFrame {
         }
         vender();
         limpiarTexto();
+        setEstado(false);
         nuevoButton.setEnabled(true);
         finalizarrButton.setEnabled(false);
         agregarButton.setEnabled(false);
@@ -613,6 +619,10 @@ public class VentasView extends javax.swing.JFrame {
     private void precioInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_precioInputActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_precioInputActionPerformed
+
+    private void cantidadInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cantidadInputActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cantidadInputActionPerformed
 
     /**
      * @param args the command line arguments
