@@ -109,9 +109,9 @@ public class DBCliente {
         PreparedStatement stmt = conn.prepareStatement(sql);
         rs = stmt.executeQuery();
         while (rs.next()) {
-            result +=  rs.getString("id") + " " + rs.getString("nombre") + "," + " \n";
-        }
-        System.out.println(result);
+                result += rs.getString("id") + " " + rs.getString("nombre") + " " + rs.getString("rfc")
+                        + " " + rs.getString("telefono") + " " + rs.getString("email") + ",";
+            }
         return result;
     }
 

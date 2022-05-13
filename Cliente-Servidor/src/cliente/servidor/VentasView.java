@@ -5,6 +5,8 @@
  */
 package cliente.servidor;
 
+import classes.Clientes;
+import classes.Producto;
 import databases.DBVenta;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -34,9 +36,10 @@ public class VentasView extends javax.swing.JFrame {
     DefaultTableModel tablaVentas;
     public Connection connection;
     private DatagramSocket socket;
+    private ArrayList<Producto> productosArray = new ArrayList<Producto>();
+    private ArrayList<Clientes> clientesArray = new ArrayList<Clientes>();
 
     Conexion conexion;
-
     String aux;
 
     public VentasView() {
@@ -53,6 +56,7 @@ public class VentasView extends javax.swing.JFrame {
             productoIdInput.setEnabled(false);
             getCatalogoProductos();
             getCatalogoClientes();
+            updatePrices();
 
         } catch (SocketException ex) {
             Logger.getLogger(VentasView.class.getName()).log(Level.SEVERE, null, ex);
@@ -75,7 +79,7 @@ public class VentasView extends javax.swing.JFrame {
             exceptionES.printStackTrace();
         }
         try {
-            esperarPaquetes(true, productoInput);
+            esperarPaquetes("productos");
             socket = new DatagramSocket();
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
@@ -95,7 +99,7 @@ public class VentasView extends javax.swing.JFrame {
             exceptionES.printStackTrace();
         }
         try {
-            esperarPaquetes(true, clienteInput);
+            esperarPaquetes("clientes");
             socket = new DatagramSocket();
         } catch (SocketException excepcionSocket) {
             excepcionSocket.printStackTrace();
@@ -103,17 +107,10 @@ public class VentasView extends javax.swing.JFrame {
         }
     }
 
-    private void setValuesCB(String[] variables, JComboBox<String> comboBox) {
-        List<String> list = new ArrayList<>(Arrays.asList(variables));
-        for (String s : list) {
-            comboBox.addItem(s);
-        }
-    }
-
-    private void esperarPaquetes(Boolean isCatalogue, JComboBox<String> comboBox) {
+    private void esperarPaquetes(String catalog) {
         try {
 //establecer el paquete
-            byte datos[] = new byte[100];
+            byte datos[] = new byte[20000];
             DatagramPacket recibirPaquete = new DatagramPacket(
                     datos, datos.length);
             socket.receive(recibirPaquete);//esperar un paquete
@@ -131,13 +128,71 @@ public class VentasView extends javax.swing.JFrame {
             String[] variables;
             variables = cad.split(",");
 
-            if (isCatalogue) {
-                setValuesCB(variables, comboBox);
+            if (!catalog.equals("")) {
+                if (catalog.equals("productos")) {
+                    for (String s : variables) {
+                        Producto p = new Producto(s);
+                        productosArray.add(p);
+                        productoInput.addItem(p.getDescripcion());
+                    }
+                }
+                if (catalog.equals("clientes")) {
+                    for (String s : variables) {
+                        Clientes c = new Clientes(s);
+                        clientesArray.add(c);
+                        clienteInput.addItem(c.getNombre());
+                    }
+                }
             }
         } catch (IOException excepcion) {
             excepcion.printStackTrace();
         }
     }//fin
+
+    private void updateRow(int index, int sumaCantidad) {
+        String descripcion = tablaVentas.getValueAt(index, 1).toString();
+        double precio = Double.parseDouble(tablaVentas.getValueAt(index, 2).toString());
+        int cantidad = Integer.parseInt(tablaVentas.getValueAt(index, 3).toString()) + sumaCantidad;
+        double importe = precio * cantidad;
+        tablaVentas.removeRow(index);
+        tablaVentas.insertRow(index, new Object[]{String.valueOf(index + 1), descripcion, String.valueOf(precio), String.valueOf(cantidad), String.valueOf(importe)});
+    }
+
+    private void addRow() {
+        int index = tablaVentas.getRowCount() + 1;
+        String descripcion = "";
+        double precio = 0.0;
+        int cantidad = Integer.parseInt(cantidadInput.getText());
+        double importe = 0.0;
+        for (Producto p : productosArray) {
+            if (String.valueOf(p.getId()).equals(productoIdInput.getText())) {
+                descripcion = p.getDescripcion();
+                precio = Double.parseDouble(p.getPrecio());
+            }
+        }
+        for (int count = 0; count < tablaVentas.getRowCount(); count++) {
+            if (tablaVentas.getValueAt(count, 1).toString().equals(descripcion)) {
+                updateRow(count, Integer.parseInt(cantidadInput.getText()));
+                return;
+            };
+        }
+        importe = cantidad * precio;
+        tablaVentas.addRow(new Object[]{String.valueOf(index), descripcion, String.valueOf(precio), String.valueOf(cantidad), String.valueOf(importe)});
+    }
+
+    private void updatePrices() {
+        double subtotal = 0;
+        double iva = 0;
+        double total = 0;
+        for (int count = 0; count < tablaVentas.getRowCount(); count++) {
+            subtotal += Double.parseDouble(tablaVentas.getValueAt(count, 4).toString());
+        }
+        iva = subtotal * 0.16;
+        total = subtotal + iva;
+        subtotalInput.setText(String.valueOf(subtotal));
+        ivaInput1.setText(String.valueOf(iva));
+        totalInput1.setText(String.valueOf(total));
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -178,6 +233,8 @@ public class VentasView extends javax.swing.JFrame {
         totalInput1 = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
+        agregarButton = new javax.swing.JButton();
+        quitarButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         ivaInput.setEditable(false);
@@ -197,7 +254,7 @@ public class VentasView extends javax.swing.JFrame {
 
         ticketTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null}
+
             },
             new String [] {
                 "Index", "Descripción", "Precio", "Cantidad", "Importe"
@@ -297,7 +354,7 @@ public class VentasView extends javax.swing.JFrame {
         jLabel16.setForeground(new java.awt.Color(255, 255, 255));
         jLabel16.setText("Cantidad");
         getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 200, -1, -1));
-        getContentPane().add(cantidadInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 220, 130, 30));
+        getContentPane().add(cantidadInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 220, 110, 30));
 
         nuevoButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
         nuevoButton.setText("Nueva venta");
@@ -342,6 +399,24 @@ public class VentasView extends javax.swing.JFrame {
         getContentPane().add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 450, -1, -1));
         getContentPane().add(jDateChooser1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, 270, 30));
 
+        agregarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        agregarButton.setText("agregar");
+        agregarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                agregarButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(agregarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 220, 80, 30));
+
+        quitarButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
+        quitarButton.setText("quitar producto");
+        quitarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quitarButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(quitarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 220, 150, 30));
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/bg-dblue.jpg"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, 520));
 
@@ -356,11 +431,21 @@ public class VentasView extends javax.swing.JFrame {
     }
     private void clienteInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clienteInputActionPerformed
         // TODO add your handling code here:
-        clienteIdInput.setText(getId((String) clienteInput.getSelectedItem()));
+        for (Clientes c : clientesArray) {
+            if (c.getNombre().equals((String) clienteInput.getSelectedItem())) {
+                clienteIdInput.setText(String.valueOf(c.getId()));
+            }
+        }
     }//GEN-LAST:event_clienteInputActionPerformed
 
     private void productoInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productoInputActionPerformed
-        productoIdInput.setText(getId((String) productoInput.getSelectedItem()));
+// TODO add your handling code here:
+        for (Producto p : productosArray) {
+            if (p.getDescripcion().equals((String) productoInput.getSelectedItem())) {
+                productoIdInput.setText(String.valueOf(p.getId()));
+                precioInput.setText(p.getPrecio());
+            }
+        }
     }//GEN-LAST:event_productoInputActionPerformed
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
@@ -376,10 +461,22 @@ public class VentasView extends javax.swing.JFrame {
     }//GEN-LAST:event_productoInputItemStateChanged
 
     private void productoInputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_productoInputKeyPressed
-        // TODO add your handling code here:
-        System.out.println(productoInput.getSelectedItem());
-        productoIdInput.setText(getId((String) productoInput.getSelectedItem()));
+       
     }//GEN-LAST:event_productoInputKeyPressed
+
+    private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
+        // TODO add your handling code here:
+        addRow();
+        updatePrices();
+    }//GEN-LAST:event_agregarButtonActionPerformed
+
+    private void quitarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitarButtonActionPerformed
+        int numRows = ticketTable.getSelectedRows().length;
+        for (int i = 0; i < numRows; i++) {
+            tablaVentas.removeRow(ticketTable.getSelectedRow());
+        }
+        updatePrices();
+    }//GEN-LAST:event_quitarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -418,6 +515,7 @@ public class VentasView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton agregarButton;
     private javax.swing.JTextField cantidadInput;
     private javax.swing.JTextField clienteIdInput;
     private javax.swing.JComboBox<String> clienteInput;
@@ -445,6 +543,7 @@ public class VentasView extends javax.swing.JFrame {
     private javax.swing.JTextField precioInput;
     private javax.swing.JTextField productoIdInput;
     private javax.swing.JComboBox<String> productoInput;
+    private javax.swing.JButton quitarButton;
     private javax.swing.JTextField subtotalInput;
     private javax.swing.JTable ticketTable;
     private javax.swing.JTextField totalInput;

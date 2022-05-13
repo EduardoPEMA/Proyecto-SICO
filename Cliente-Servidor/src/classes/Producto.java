@@ -14,6 +14,18 @@ public class Producto {
     private String descripcion;
     private String stock;
     private String precio;
+    
+    public Producto() {
+        
+    }
+    
+    public Producto(String p) {
+        String[] arrayString = p.split(" ");
+        this.id = Integer.parseInt(arrayString[0]);
+        this.descripcion = arrayString[1];
+        this.stock = arrayString[2];
+        this.precio = arrayString[3];
+    }
 
     public int getId() {
         return id;

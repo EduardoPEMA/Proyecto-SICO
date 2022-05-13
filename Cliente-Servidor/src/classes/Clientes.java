@@ -15,6 +15,19 @@ public class Clientes {
     private String rfc;
     private String telefono;
     private String email;
+    
+     public Clientes() {
+        
+    }
+    
+    public Clientes(String p) {
+        String[] arrayString = p.split(" ");
+        this.id = Integer.parseInt(arrayString[0]);
+        this.nombre = arrayString[1];
+        this.rfc = arrayString[2];
+        this.telefono = arrayString[3];
+        this.email = arrayString[4];
+    }
 
     public int getId() {
         return id;

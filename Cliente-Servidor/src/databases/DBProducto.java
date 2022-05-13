@@ -101,7 +101,8 @@ public class DBProducto {
         PreparedStatement stmt = conn.prepareStatement(sql);
         rs = stmt.executeQuery();
         while (rs.next()) {
-            result +=  rs.getString("id") + " " + rs.getString("descripcion") + "," + " \n";
+            result += rs.getString("id") + " " + rs.getString("descripcion") + " " + rs.getString("stock")
+                    + " " + rs.getString("precio") + ",";
         }
         return result;
     }

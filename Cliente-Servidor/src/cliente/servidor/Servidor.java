@@ -227,6 +227,17 @@ public class Servidor extends javax.swing.JFrame {
 
                                     break;
                                 }
+                                case "listar": {
+                                    DBCliente db = new DBCliente(conn);
+                                    mensaje = db.listarClientes();
+                                    mensajeAlerta = "listar";
+                                    if (mensaje.length() == 0) {
+                                        mensaje = "No hay resultados";
+                                        mensajeAlerta = "No hay resultados";
+                                        mostrarMensaje("Sin resultados");
+                                    }
+                                    break;
+                                }
                             }
                             break;
                         }
