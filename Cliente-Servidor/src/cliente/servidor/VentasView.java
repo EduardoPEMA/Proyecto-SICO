@@ -7,6 +7,7 @@ package cliente.servidor;
 
 import classes.Clientes;
 import classes.Producto;
+import classes.Venta;
 import com.toedter.calendar.JTextFieldDateEditor;
 import databases.DBVenta;
 import java.io.IOException;
@@ -26,6 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import utils.Utils;
 
 /**
  *
@@ -42,6 +44,7 @@ public class VentasView extends javax.swing.JFrame {
     private ArrayList<Producto> productosArray = new ArrayList<Producto>();
     private ArrayList<Clientes> clientesArray = new ArrayList<Clientes>();
 
+    Utils utils = new Utils();
     Conexion conexion;
     String aux;
 
@@ -131,8 +134,8 @@ public class VentasView extends javax.swing.JFrame {
                 limpiarTexto();
                 return;
             }
-            if(cad.equals("Venta realizada con exito")) {
-                                JOptionPane.showMessageDialog(null, cad);
+            if (cad.equals("Venta realizada con exito")) {
+                JOptionPane.showMessageDialog(null, cad);
             }
             String[] variables;
             variables = cad.split(",");
@@ -158,10 +161,20 @@ public class VentasView extends javax.swing.JFrame {
         }
     }//fin
 
+    private Boolean stockDisponible(int cantidad) {
+        String producto = productoInput.getSelectedItem().toString();
+        Producto p = encontrarProductos(producto);
+        return Integer.parseInt(p.getStock()) >= cantidad;
+    }
+
     private void updateRow(int index, int sumaCantidad) {
         String descripcion = tablaVentas.getValueAt(index, 1).toString();
         double precio = Double.parseDouble(tablaVentas.getValueAt(index, 2).toString());
         int cantidad = Integer.parseInt(tablaVentas.getValueAt(index, 3).toString()) + sumaCantidad;
+        if (!stockDisponible(cantidad)) {
+            JOptionPane.showMessageDialog(null, "No hay suficiente stock disponible.");
+            return;
+        }
         double importe = precio * cantidad;
         tablaVentas.removeRow(index);
         tablaVentas.insertRow(index, new Object[]{String.valueOf(index + 1), descripcion, String.valueOf(precio), String.valueOf(cantidad), String.valueOf(importe)});
@@ -202,8 +215,8 @@ public class VentasView extends javax.swing.JFrame {
         ivaInput1.setText(String.valueOf(iva));
         totalInput1.setText(String.valueOf(total));
     }
-    
-    private Producto encontrarProductos (String value) {
+
+    private Producto encontrarProductos(String value) {
         for (Producto p : productosArray) {
             if (p.getDescripcion().equals(value)) {
                 return p;
@@ -211,16 +224,16 @@ public class VentasView extends javax.swing.JFrame {
         }
         return new Producto();
     }
-    
-    private String generarListaProductos(){
+
+    private String generarListaProductos() {
         String lista = "";
         for (int count = 0; count < tablaVentas.getRowCount(); count++) {
             Producto p = encontrarProductos(tablaVentas.getValueAt(count, 1).toString());
             lista += p.getId() + "," + tablaVentas.getValueAt(count, 3).toString() + ",";
         }
         return lista;
-}
-    
+    }
+
     private void vender() {
         // TODO add your handling code here:
         try {
@@ -229,7 +242,7 @@ public class VentasView extends javax.swing.JFrame {
             String fecha = String.valueOf(jDateChooser1.getDate().getTime());
             String cliente = clienteIdInput.getText();
             String total = totalInput1.getText();
-            String prod = generarListaProductos();                                    
+            String prod = generarListaProductos();
             String mensaje = "ventas" + " " + "vender" + " " + folio + " " + fecha + " " + cliente + " " + total + " " + prod;
             System.out.println(mensaje);
             byte datos[] = mensaje.getBytes();
@@ -246,7 +259,7 @@ public class VentasView extends javax.swing.JFrame {
             excepcionSocket.printStackTrace();
             System.exit(1);
         }
-        
+
     }
 
     /**
@@ -409,6 +422,12 @@ public class VentasView extends javax.swing.JFrame {
         jLabel16.setForeground(new java.awt.Color(255, 255, 255));
         jLabel16.setText("Cantidad");
         getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 200, -1, -1));
+
+        cantidadInput.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                cantidadInputKeyReleased(evt);
+            }
+        });
         getContentPane().add(cantidadInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 220, 110, 30));
 
         nuevoButton.setFont(new java.awt.Font("Bahnschrift", 1, 11)); // NOI18N
@@ -505,8 +524,8 @@ public class VentasView extends javax.swing.JFrame {
 
     private void nuevoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevoButtonActionPerformed
         // TODO add your handling code here:
-        UUID id = UUID.randomUUID();
-        folioInput.setText(id.toString());
+        Venta v = new Venta();
+        folioInput.setText(String.valueOf(v.getFolio()));
 
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
@@ -519,13 +538,13 @@ public class VentasView extends javax.swing.JFrame {
     }//GEN-LAST:event_productoInputItemStateChanged
 
     private void productoInputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_productoInputKeyPressed
-       
+
     }//GEN-LAST:event_productoInputKeyPressed
 
     private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
         // TODO add your handling code here:
-        if(Integer.parseInt(cantidadInput.getText()) < 0) {
-            JOptionPane.showMessageDialog(null, "No se pueden agregar cantidad negativas", "error", JOptionPane.ERROR_MESSAGE);
+        if (!stockDisponible(Integer.parseInt(cantidadInput.getText()))) {
+            JOptionPane.showMessageDialog(null, "No hay suficiente stock disponible.");
             return;
         }
         addRow();
@@ -533,12 +552,26 @@ public class VentasView extends javax.swing.JFrame {
     }//GEN-LAST:event_agregarButtonActionPerformed
 
     private void quitarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitarButtonActionPerformed
-        int numRows = ticketTable.getSelectedRows().length;
+        int numRows = 0;
+        numRows = ticketTable.getSelectedRows().length;
+        if (numRows == 0) {
+            JOptionPane.showMessageDialog(null, "No se ha seleccionado ninguna fila.");
+        }
         for (int i = 0; i < numRows; i++) {
             tablaVentas.removeRow(ticketTable.getSelectedRow());
         }
         updatePrices();
     }//GEN-LAST:event_quitarButtonActionPerformed
+
+    private void cantidadInputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cantidadInputKeyReleased
+        // TODO add your handling code here:
+        String aux = cantidadInput.getText();
+        if (utils.isNumber(aux)) {
+            agregarButton.setEnabled(true);
+        } else {
+            agregarButton.setEnabled(false);
+        }
+    }//GEN-LAST:event_cantidadInputKeyReleased
 
     /**
      * @param args the command line arguments
