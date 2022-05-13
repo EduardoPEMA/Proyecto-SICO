@@ -77,10 +77,27 @@ public class DBVenta {
     }
     
     
-    public String vender(Venta venta, Producto pro) throws SQLException {
+    public String vender(Venta venta,String[]  productos) throws SQLException {
         String res = "";
-        String sql = "";
-        return "";
+        String sql = "INSERT INTO ventas values (?, ?, ?, ?)";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, venta.getFolio());
+        stmt.setString(2, venta.getFecha());
+        stmt.setString(3, venta.getTotal());
+        stmt.setString(4, venta.getCliente());
+
+        Integer id = stmt.executeUpdate();
+        int i = 0;
+        
+        while(i < productos.length) {
+            sql = "INSERT INTO detalle_venta (venta_id, producto_id, cantidad) VALUES (?, ?, ?)";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, id.toString());
+            stmt.setString(2, productos[i++]);
+            stmt.setString(3, productos[i++]);
+            stmt.executeUpdate();
+        }
+        return "ok";
     }
 
 }

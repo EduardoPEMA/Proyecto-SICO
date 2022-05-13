@@ -12,6 +12,7 @@ import classes.Venta;
 import databases.DBCliente;
 import databases.DBProducto;
 import databases.DBUsuarios;
+import databases.DBVenta;
 import java.io.*;
 import java.net.*;
 import java.awt.*;
@@ -286,6 +287,29 @@ public class Servidor extends javax.swing.JFrame {
                                 case "listar": {
                                     DBProducto db = new DBProducto(conn);
                                     mensaje = db.listarProductos();
+                                    mensajeAlerta = "listar";
+                                    if (mensaje.length() == 0) {
+                                        mensaje = "No hay resultados";
+                                        mensajeAlerta = "No hay resultados";
+                                        mostrarMensaje("Sin resultados");
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case "ventas": {
+                            switch (variables[1]) {
+                                case "vender": {
+                                    DBVenta db = new DBVenta(conn);
+                                    
+                                    ven.setFolio(variables[2]);
+                                    ven.setFecha(variables[3]);
+                                    ven.setCliente(variables[4]);
+                                    ven.setTotal(variables[5]);
+                                    
+                                    String[] arrayString = variables[6].split(",");
+                                    mensaje = db.vender(ven, arrayString);
                                     mensajeAlerta = "listar";
                                     if (mensaje.length() == 0) {
                                         mensaje = "No hay resultados";
