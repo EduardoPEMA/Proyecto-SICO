@@ -558,6 +558,10 @@ public class VentasView extends javax.swing.JFrame {
     }//GEN-LAST:event_nuevoButtonActionPerformed
 
     private void finalizarrButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finalizarrButtonActionPerformed
+        if (tablaVentas.getRowCount() <= 0) {
+            JOptionPane.showMessageDialog(null, "Debes agregar al menos un producto para realizar la venta");
+            return;
+        }
         vender();
         limpiarTexto();
         nuevoButton.setEnabled(true);
