@@ -75,9 +75,8 @@ public class DBVenta {
         }
         return result;
     }
-    
-    
-    public String vender(Venta venta,String[]  productos) throws SQLException {
+
+    public String vender(Venta venta, String[] productos) throws SQLException {
         String res = "";
         String sql = "INSERT INTO ventas (folio, fecha, total, cliente_id) values (?, DATE(?), ?, ?)";
         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -85,14 +84,22 @@ public class DBVenta {
         stmt.setString(2, venta.getFecha());
         stmt.setString(3, venta.getTotal());
         stmt.setString(4, venta.getCliente());
+        stmt.executeUpdate();
 
-        Integer id = stmt.executeUpdate();
+        String id = "";
+        sql = "select * from ventas where folio = ?";
+        stmt = conn.prepareStatement(sql);
+        stmt.setString(1, venta.getFolio());
+        rs = stmt.executeQuery();
+        while (rs.next()) {
+            id += rs.getString("id");
+        }
         int i = 0;
-        
-        while(i < productos.length) {
+
+        while (i < productos.length) {
             sql = "INSERT INTO detalle_venta (venta_id, producto_id, cantidad) VALUES (?, ?, ?)";
             stmt = conn.prepareStatement(sql);
-            stmt.setString(1, id.toString());
+            stmt.setString(1, id);
             stmt.setString(2, productos[i++]);
             stmt.setString(3, productos[i++]);
             stmt.executeUpdate();

@@ -319,10 +319,10 @@ public class Servidor extends javax.swing.JFrame {
                                     System.out.println(ven.getFecha());
                                     ven.setCliente(variables[4]);
                                     ven.setTotal(variables[5]);
-                                    
                                     String[] arrayString = variables[6].split(",");
                                     mensaje = db.vender(ven, arrayString);
                                     mensajeAlerta = "listar";
+                                    mensaje = "Venta realizada con exito";
                                     if (mensaje.length() == 0) {
                                         mensaje = "No hay resultados";
                                         mensajeAlerta = "No hay resultados";

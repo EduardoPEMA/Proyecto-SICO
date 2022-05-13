@@ -131,6 +131,9 @@ public class VentasView extends javax.swing.JFrame {
                 limpiarTexto();
                 return;
             }
+            if(cad.equals("Venta realizada con exito")) {
+                                JOptionPane.showMessageDialog(null, cad);
+            }
             String[] variables;
             variables = cad.split(",");
 
@@ -360,7 +363,7 @@ public class VentasView extends javax.swing.JFrame {
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, -1, -1));
 
         folioInput.setEditable(false);
-        getContentPane().add(folioInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 110, 30));
+        getContentPane().add(folioInput, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 270, 30));
 
         jLabel6.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
